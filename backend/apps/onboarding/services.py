@@ -124,3 +124,54 @@ def _unlock_next_task(completed_task: JourneyTask):
         if first_task_next_phase and first_task_next_phase.status == 'locked':
             first_task_next_phase.status = 'current'
             first_task_next_phase.save(update_fields=['status'])
+
+
+def submit_task_for_verification(*, task: JourneyTask, submitted_by):
+    from django.utils import timezone
+
+    if task.verification_type != 'manager_verified':
+        raise ValueError('This task does not require manager verification.')
+
+    if task.status not in ('current', 'upcoming', 'sent_back'):
+        raise ValueError(
+            'This task cannot be submitted from its current state.')
+
+    task.status = 'completed'
+    task.completed_at = timezone.now()
+    task.verification_note = ''  # clear any prior send-back reason on resubmit
+    task.save()
+
+    recalculate_progress(task.phase.journey)
+    return task
+
+
+def verify_task(*, task: JourneyTask, verified_by):
+    from django.utils import timezone
+
+    if task.status != 'completed':
+        raise ValueError(
+            'This task has not been submitted for verification yet.')
+
+    task.status = 'verified'
+    task.verified_by = verified_by
+    task.verified_at = timezone.now()
+    task.save()
+
+    _unlock_next_task(task)
+    recalculate_progress(task.phase.journey)
+    return task
+
+
+def send_back_task(*, task: JourneyTask, reviewed_by, reason):
+    if task.status != 'completed':
+        raise ValueError(
+            'This task has not been submitted for verification yet.')
+
+    task.status = 'sent_back'
+    task.verified_by = reviewed_by
+    task.verification_note = reason
+    task.save()
+
+    # sent_back no longer counts as done
+    recalculate_progress(task.phase.journey)
+    return task

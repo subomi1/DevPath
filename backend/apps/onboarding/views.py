@@ -1,3 +1,7 @@
+from django.shortcuts import get_object_or_404
+from .serializers import SendBackTaskSerializer
+from .services import submit_task_for_verification, verify_task, send_back_task
+from apps.accounts.permissions import IsManagerOfDeveloper
 from .services import complete_task
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -37,3 +41,56 @@ class CompleteJourneyTaskView(APIView):
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'message': 'Task marked complete.'})
+
+
+class SubmitJourneyTaskView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, task_id):
+        try:
+            task = JourneyTask.objects.get(
+                id=task_id, phase__journey__developer=request.user)
+        except JourneyTask.DoesNotExist:
+            return Response({'detail': 'Task not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            submit_task_for_verification(task=task, submitted_by=request.user)
+        except ValueError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Submitted for manager verification.'})
+
+
+class VerifyJourneyTaskView(APIView):
+    permission_classes = [IsAuthenticated, IsManagerOfDeveloper]
+
+    def post(self, request, task_id):
+        task = get_object_or_404(JourneyTask, id=task_id)
+        # triggers IsManagerOfDeveloper's object check
+        self.check_object_permissions(request, task)
+
+        try:
+            verify_task(task=task, verified_by=request.user)
+        except ValueError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Task verified.'})
+
+
+class SendBackJourneyTaskView(APIView):
+    permission_classes = [IsAuthenticated, IsManagerOfDeveloper]
+
+    def post(self, request, task_id):
+        task = get_object_or_404(JourneyTask, id=task_id)
+        self.check_object_permissions(request, task)
+
+        serializer = SendBackTaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            send_back_task(task=task, reviewed_by=request.user,
+                           reason=serializer.validated_data['reason'])
+        except ValueError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Task sent back to developer.'})

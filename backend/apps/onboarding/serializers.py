@@ -28,3 +28,6 @@ class DeveloperJourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = DeveloperJourney
         fields = ['id', 'started_at', 'completed_at', 'overall_progress', 'phases']
+        
+class SendBackTaskSerializer(serializers.Serializer):
+    reason = serializers.CharField()

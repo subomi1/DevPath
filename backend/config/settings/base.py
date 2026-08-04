@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.organization',
     'apps.onboarding',
+    'apps.access_request',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

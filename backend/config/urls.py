@@ -10,4 +10,5 @@ urlpatterns = [
     path('api/v1/', include('apps.accounts.urls')),
     path('api/v1/', include('apps.onboarding.urls')),
     path('api/v1/', include('apps.access_request.urls')),
+    path('api/v1/', include('apps.mentorship.urls')),
 ]

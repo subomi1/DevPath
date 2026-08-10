@@ -66,8 +66,8 @@ class ArticleDetailView(APIView):
             Article.objects.select_related('category', 'author').prefetch_related('tags', 'attachments'),
             slug=slug,
         )
-        # increment view count on every real read
         Article.objects.filter(id=article.id).update(view_count=article.view_count + 1)
+        article.view_count += 1
 
         return Response(ArticleDetailSerializer(article).data)
 

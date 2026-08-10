@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'apps.mentorship',
     'apps.knowledge_base',
     'apps.announcements',
+    'apps.dashboard',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

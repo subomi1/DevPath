@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/v1/', include('apps.mentorship.urls')),
     path('api/v1/', include('apps.knowledge_base.urls')),
     path('api/v1/', include('apps.announcements.urls')),
+    path('api/v1/', include('apps.dashboard.urls')),
 ]

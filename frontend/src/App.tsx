@@ -1,33 +1,37 @@
 import { useState } from 'react'
-import client from './api/client'
+import { useAuth } from './hooks/useAuth'
 
 function App() {
-  const [result, setResult] = useState<string>('')
+  const { user, login, logout, isAuthenticated } = useAuth()
+  const [error, setError] = useState('')
 
-  const testLogin = async () => {
+  const handleLogin = async () => {
     try {
-      const response = await client.post('/auth/login/', {
-        email: 'jordan.rivers@example.com',
-        password: 'testpassword123',
-      })
-      setResult(JSON.stringify(response.data, null, 2))
-    } catch (error) {
-      setResult('Error: ' + JSON.stringify(error, null, 2))
+      await login('jordan.rivers@example.com', 'testpassword123')
+      setError('')
+    } catch (err) {
+      setError('Login failed')
     }
   }
 
   return (
     <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-4 p-8">
       <h1 className="font-display text-2xl text-ink">AppZone</h1>
-      <button
-        onClick={testLogin}
-        className="bg-primary text-white px-4 py-2 rounded-lg"
-      >
-        Test Login
-      </button>
-      <pre className="bg-surface border border-border rounded-lg p-4 text-xs max-w-2xl overflow-auto">
-        {result}
-      </pre>
+
+      {isAuthenticated ? (
+        <>
+          <p className="text-ink">Logged in as {user?.full_name} ({user?.role})</p>
+          <button onClick={logout} className="bg-danger text-white px-4 py-2 rounded-lg">
+            Log out
+          </button>
+        </>
+      ) : (
+        <button onClick={handleLogin} className="bg-primary text-white px-4 py-2 rounded-lg">
+          Log in as Jordan
+        </button>
+      )}
+
+      {error && <p className="text-danger">{error}</p>}
     </div>
   )
 }

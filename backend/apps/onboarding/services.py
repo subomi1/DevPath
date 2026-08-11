@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.utils import timezone
 from .models import (
     OnboardingTemplate, DeveloperJourney, JourneyPhase, JourneyTask
 )
@@ -8,12 +9,8 @@ def clone_template_to_journey(*, developer, template: OnboardingTemplate):
     """
     Called once, at invitation time. Copies the template's phase/task
     structure into brand-new, independent rows owned by this developer.
-    Editing the original template afterward will never affect journeys
-    that already exist — that's the whole point of cloning rather than
-    just linking back to the template's tasks directly.
     """
-    journey = DeveloperJourney.objects.create(
-        developer=developer, template=template)
+    journey = DeveloperJourney.objects.create(developer=developer, template=template)
 
     is_first_task = True
 
@@ -27,11 +24,8 @@ def clone_template_to_journey(*, developer, template: OnboardingTemplate):
         for template_task in template_phase.tasks.all():
             due_date = None
             if developer.start_date:
-                due_date = developer.start_date + \
-                    timedelta(days=template_task.due_offset_days)
+                due_date = developer.start_date + timedelta(days=template_task.due_offset_days)
 
-            # the very first task in the whole journey starts as 'current',
-            # everything else starts 'locked' — matches the hex-node UI states
             status = 'current' if is_first_task else 'locked'
             is_first_task = False
 
@@ -54,9 +48,8 @@ def clone_template_to_journey(*, developer, template: OnboardingTemplate):
 
 def recalculate_progress(journey: DeveloperJourney):
     """
-    Stores the journey's completion % directly on the model, rather than
-    computing it live on every dashboard/roster read (flagged back in the
-    schema doc — this gets called any time a task's status changes).
+    Stores the journey's completion % directly on the model, and keeps
+    completed_at in sync with whether progress has actually reached 100%.
     """
     tasks = JourneyTask.objects.filter(phase__journey=journey)
     total = tasks.count()
@@ -67,25 +60,25 @@ def recalculate_progress(journey: DeveloperJourney):
         done = tasks.filter(status__in=['completed', 'verified']).count()
         journey.overall_progress = round((done / total) * 100)
 
-    journey.save(update_fields=['overall_progress'])
+    if journey.overall_progress == 100 and not journey.completed_at:
+        journey.completed_at = timezone.now()
+    elif journey.overall_progress < 100 and journey.completed_at:
+        journey.completed_at = None
+
+    journey.save(update_fields=['overall_progress', 'completed_at'])
     return journey.overall_progress
 
 
 def complete_task(*, task: JourneyTask, completed_by):
     """
     Handles a developer marking a self-completed task done. This is where
-    the 'unlock the next task' behavior lives — completing one task moves
-    the *next* task (by order, within the same phase) from locked to current.
+    the 'unlock the next task' behavior lives.
     """
-    from django.utils import timezone
-
     if task.verification_type != 'self':
-        raise ValueError(
-            'This task requires manager verification and cannot be self-completed.')
+        raise ValueError('This task requires manager verification and cannot be self-completed.')
 
     if task.status not in ('current', 'upcoming'):
-        raise ValueError(
-            'This task cannot be completed from its current state.')
+        raise ValueError('This task cannot be completed from its current state.')
 
     task.status = 'completed'
     task.completed_at = timezone.now()
@@ -100,8 +93,8 @@ def complete_task(*, task: JourneyTask, completed_by):
 def _unlock_next_task(completed_task: JourneyTask):
     """
     Finds the next task in order — first checking the same phase, then
-    falling through to the next phase's first task if this was the last
-    task in its phase — and flips it from locked to current.
+    falling through to the next phase's first task — and flips it from
+    locked to current.
     """
     journey = completed_task.phase.journey
 
@@ -127,18 +120,15 @@ def _unlock_next_task(completed_task: JourneyTask):
 
 
 def submit_task_for_verification(*, task: JourneyTask, submitted_by):
-    from django.utils import timezone
-
     if task.verification_type != 'manager_verified':
         raise ValueError('This task does not require manager verification.')
 
     if task.status not in ('current', 'upcoming', 'sent_back'):
-        raise ValueError(
-            'This task cannot be submitted from its current state.')
+        raise ValueError('This task cannot be submitted from its current state.')
 
     task.status = 'completed'
     task.completed_at = timezone.now()
-    task.verification_note = ''  # clear any prior send-back reason on resubmit
+    task.verification_note = ''
     task.save()
 
     recalculate_progress(task.phase.journey)
@@ -146,11 +136,8 @@ def submit_task_for_verification(*, task: JourneyTask, submitted_by):
 
 
 def verify_task(*, task: JourneyTask, verified_by):
-    from django.utils import timezone
-
     if task.status != 'completed':
-        raise ValueError(
-            'This task has not been submitted for verification yet.')
+        raise ValueError('This task has not been submitted for verification yet.')
 
     task.status = 'verified'
     task.verified_by = verified_by
@@ -164,14 +151,12 @@ def verify_task(*, task: JourneyTask, verified_by):
 
 def send_back_task(*, task: JourneyTask, reviewed_by, reason):
     if task.status != 'completed':
-        raise ValueError(
-            'This task has not been submitted for verification yet.')
+        raise ValueError('This task has not been submitted for verification yet.')
 
     task.status = 'sent_back'
     task.verified_by = reviewed_by
     task.verification_note = reason
     task.save()
 
-    # sent_back no longer counts as done
     recalculate_progress(task.phase.journey)
     return task

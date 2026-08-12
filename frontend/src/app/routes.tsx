@@ -6,6 +6,7 @@ import { NotFoundPage } from "./NotFoundPage";
 import JourneyPage from "../features/developer/JourneyPage.tsx";
 import KnowledgeBasePage from "../features/developer/KnowledgeBasePage";
 import ArticleDetailPage from "../features/developer/ArticleDetailPage";
+import AccessRequestsPage from "../features/developer/AccessRequestsPage";
 
 export function AppRoutes() {
   return (
@@ -41,6 +42,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <ArticleDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/access-requests"
+          element={
+            <ProtectedRoute>
+              <AccessRequestsPage />
             </ProtectedRoute>
           }
         />

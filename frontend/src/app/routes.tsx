@@ -3,7 +3,9 @@ import LoginPage from "../features/auth/LoginPage";
 import DashboardPage from "../features/developer/DashboardPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { NotFoundPage } from "./NotFoundPage";
-import JourneyPage  from "../features/developer/JourneyPage.tsx";
+import JourneyPage from "../features/developer/JourneyPage.tsx";
+import KnowledgeBasePage from "../features/developer/KnowledgeBasePage";
+import ArticleDetailPage from "../features/developer/ArticleDetailPage";
 
 export function AppRoutes() {
   return (
@@ -23,6 +25,22 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <JourneyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/knowledge-base"
+          element={
+            <ProtectedRoute>
+              <KnowledgeBasePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/knowledge-base/:slug"
+          element={
+            <ProtectedRoute>
+              <ArticleDetailPage />
             </ProtectedRoute>
           }
         />

@@ -30,10 +30,10 @@ export default function JourneyPage() {
   return (
     <AppShell title="My Journey">
       <div className="p-6 max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 flex-wrap">
           <div>
             <h1 className="font-display text-xl font-semibold text-ink">Your onboarding journey</h1>
-            <p className="text-sm text-ink-muted mt-1">{journey.overall_progress}% complete</p>
+            <p className="text-sm text-ink-muted mt-1 mb-2">{journey.overall_progress}% complete</p>
           </div>
           <div className="flex bg-canvas border border-border rounded-lg p-1">
             <button

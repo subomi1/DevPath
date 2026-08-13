@@ -29,7 +29,7 @@ export default function JourneyPage() {
 
   return (
     <AppShell title="My Journey">
-      <div className="p-6 max-w-3xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6 flex-wrap">
           <div>
             <h1 className="font-display text-xl font-semibold text-ink">Your onboarding journey</h1>

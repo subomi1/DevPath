@@ -65,7 +65,7 @@ export default function AccessRequestsPage() {
 
   return (
     <AppShell title="Access Requests">
-      <div className="p-6">
+      <div className="p-6 lg:p-8 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display text-xl font-semibold text-ink">Access Requests</h1>
@@ -101,7 +101,7 @@ export default function AccessRequestsPage() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-ink/40 z-40" onClick={() => setDrawerOpen(false)} />
-          <div className="fixed top-0 right-0 h-screen w-full max-w-md bg-surface z-50 flex flex-col shadow-xl">
+          <div className="fixed top-0 right-0 h-screen w-full max-w-lg bg-surface z-50 flex flex-col shadow-xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <h2 className="font-display font-semibold text-ink">Request access</h2>
               <button onClick={() => setDrawerOpen(false)} className="text-ink-muted">

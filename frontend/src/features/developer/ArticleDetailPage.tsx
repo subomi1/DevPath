@@ -25,7 +25,7 @@ export default function ArticleDetailPage() {
 
   return (
     <AppShell title={article.title}>
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="max-w-3xl mx-auto p-6 lg:p-8">
         <Link to="/developer/knowledge-base" className="flex items-center gap-1.5 text-sm text-ink-muted mb-6">
           <ArrowLeft size={16} /> Back to Knowledge Base
         </Link>

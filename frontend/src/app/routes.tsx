@@ -7,6 +7,8 @@ import JourneyPage from "../features/developer/JourneyPage.tsx";
 import KnowledgeBasePage from "../features/developer/KnowledgeBasePage";
 import ArticleDetailPage from "../features/developer/ArticleDetailPage";
 import AccessRequestsPage from "../features/developer/AccessRequestsPage";
+import MentorPage from "../features/developer/MentorPage";
+import AnnouncementsPage from "../features/developer/AnnouncementsPage";
 
 export function AppRoutes() {
   return (
@@ -50,6 +52,22 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <AccessRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/mentor"
+          element={
+            <ProtectedRoute>
+              <MentorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/announcements"
+          element={
+            <ProtectedRoute>
+              <AnnouncementsPage />
             </ProtectedRoute>
           }
         />

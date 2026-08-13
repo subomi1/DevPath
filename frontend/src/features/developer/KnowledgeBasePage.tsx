@@ -40,7 +40,7 @@ export default function KnowledgeBasePage() {
         </div>
 
         {/* Article grid */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 lg:p-8">
           <div className="relative mb-6 max-w-md">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
             <input
@@ -58,7 +58,7 @@ export default function KnowledgeBasePage() {
             <p className="text-sm text-ink-muted">No articles found.</p>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {articles?.map((article) => (
               <Link
                 key={article.id}

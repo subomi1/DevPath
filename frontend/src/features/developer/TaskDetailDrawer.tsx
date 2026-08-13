@@ -21,7 +21,7 @@ export function TaskDetailDrawer({ task, onClose }: { task: JourneyTask; onClose
   return (
     <>
       <div className="fixed inset-0 bg-ink/40 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 h-screen w-full max-w-md bg-surface z-50 flex flex-col shadow-xl">
+      <div className="fixed top-0 right-0 h-screen w-full max-w-lg bg-surface z-50 flex flex-col shadow-xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="font-display font-semibold text-ink">Task Details</h2>
           <button onClick={onClose} className="text-ink-muted">

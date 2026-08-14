@@ -9,6 +9,9 @@ import ArticleDetailPage from "../features/developer/ArticleDetailPage";
 import AccessRequestsPage from "../features/developer/AccessRequestsPage";
 import MentorPage from "../features/developer/MentorPage";
 import AnnouncementsPage from "../features/developer/AnnouncementsPage";
+import ProfilePage from "../features/developer/ProfilePage";
+import ManagerDashboardPage from "../features/manager/DashboardPage";
+import DeveloperDetailPage from "../features/manager/DeveloperDetailPage";
 
 export function AppRoutes() {
   return (
@@ -68,6 +71,30 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <AnnouncementsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/dashboard"
+          element={
+            <ProtectedRoute>
+              <ManagerDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/team/:id"
+          element={
+            <ProtectedRoute>
+              <DeveloperDetailPage />
             </ProtectedRoute>
           }
         />

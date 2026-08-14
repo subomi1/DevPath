@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useDeveloperDashboard } from "../../hooks/useDashboard";
 import { useAuth } from "../../hooks/useAuth";
 import { AppShell } from "../../layouts/AppShell";
@@ -7,155 +8,316 @@ import {
   KeyRound,
   MessageSquare,
   CalendarPlus,
+  Clock,
+  ArrowRight,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  Bell,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function DashboardPage() {
   const { data, isLoading, error } = useDeveloperDashboard();
   const { user } = useAuth();
 
+  const firstName = user?.full_name?.split(" ")[0] || "Developer";
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <p className="text-ink-muted">Loading...</p>
-      </div>
+      <AppShell title="Dashboard">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+          {/* Hero Skeleton */}
+          <div className="h-32 bg-surface border border-border rounded-2xl animate-pulse" />
+          {/* Stats Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-24 bg-surface border border-border rounded-2xl animate-pulse"
+              />
+            ))}
+          </div>
+          {/* Main Content Grid Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 h-80 bg-surface border border-border rounded-2xl animate-pulse" />
+            <div className="h-80 bg-surface border border-border rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      </AppShell>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <p className="text-danger">
-          Something went wrong loading your dashboard.
-        </p>
-      </div>
+      <AppShell title="Dashboard">
+        <div className="min-h-[70vh] flex items-center justify-center p-6">
+          <div className="bg-surface border border-border rounded-2xl p-8 max-w-md text-center space-y-4 shadow-xs">
+            <div className="w-12 h-12 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mx-auto">
+              <AlertCircle size={24} />
+            </div>
+            <div className="space-y-1">
+              <h2 className="font-display font-semibold text-ink text-base">
+                Failed to load dashboard
+              </h2>
+              <p className="text-xs sm:text-sm text-ink-muted">
+                Something went wrong while fetching your onboarding overview. Please try refreshing.
+              </p>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 bg-primary text-white text-xs font-semibold px-4 py-2 rounded-xl"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      </AppShell>
     );
   }
 
   return (
     <AppShell title="Dashboard">
-      <div className="min-h-screen bg-canvas p-6">
-        {/* Hero row */}
-        <div className="bg-surface border border-border rounded-lg p-6 mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-semibold text-ink">
-              Welcome back, {user?.full_name?.split(" ")[0]}
+      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto w-full space-y-6 min-h-[calc(100vh-4rem)]">
+        {/* Hero Banner Row */}
+        <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="space-y-2 max-w-xl z-10">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-ink tracking-tight">
+              Welcome back, {firstName}!
             </h1>
-            <p className="text-ink-muted text-sm mt-1">
+            <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
               {data.overall_progress === 0
-                ? "Let's get started"
-                : `${data.overall_progress}% complete`}
+                ? "Ready to kickstart your developer journey? Check your daily tasks below."
+                : `You're making great progress! ${data.overall_progress}% of your onboarding checklist is complete.`}
             </p>
           </div>
-          <div className="flex flex-col items-center">
-            <p className="text-xs text-ink-muted uppercase tracking-wide mb-1">
-              Overall Progress
-            </p>
-            <div className="w-20 h-20 flex items-center justify-center border-4 border-primary rounded-full">
-              <span className="font-display text-xl font-semibold text-primary">
+
+          {/* Circular Progress Meter */}
+          <div className="flex items-center gap-4 bg-canvas/60 border border-border/80 rounded-2xl p-4 sm:p-5 shrink-0 z-10 self-stretch sm:self-auto justify-center">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+              <svg
+                className="w-full h-full transform -rotate-90"
+                viewBox="0 0 36 36"
+              >
+                <path
+                  className="text-border"
+                  strokeWidth="3.5"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="text-primary transition-all duration-1000 ease-out"
+                  strokeDasharray={`${data.overall_progress}, 100`}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+              <span className="absolute font-display text-sm sm:text-base font-bold text-ink">
                 {data.overall_progress}%
               </span>
             </div>
+            <div className="text-left space-y-0.5">
+              <p className="text-xs font-semibold text-ink uppercase tracking-wider">
+                Overall
+              </p>
+              <p className="text-xs text-ink-muted">Progress</p>
+            </div>
           </div>
         </div>
 
-        {/* Stat row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {/* Quick Stat Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard
-            icon={<CheckSquare size={18} />}
+            icon={CheckSquare}
             label="Today's Tasks"
             value={data.today_tasks_count}
+            subtext="Items pending review"
+            color="primary"
           />
           <StatCard
-            icon={<Calendar size={18} />}
+            icon={Calendar}
             label="Upcoming Events"
             value={0}
+            subtext="Syncs & meetings"
+            color="emerald"
           />
           <StatCard
-            icon={<KeyRound size={18} />}
+            icon={KeyRound}
             label="Open Access Requests"
             value={data.open_access_requests_count}
+            subtext="Pending provisioning"
+            color="amber"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Today's Tasks */}
-          <div className="lg:col-span-2 bg-surface border border-border rounded-lg p-5">
-            <h2 className="font-display font-semibold text-ink mb-4">
-              Today's Tasks
-            </h2>
-            {data.today_tasks.length === 0 ? (
-              <p className="text-sm text-ink-muted">No tasks due today.</p>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {data.today_tasks.map((task) => (
-                  <li
-                    key={task.id}
-                    className="flex items-center justify-between border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      <input type="checkbox" className="w-4 h-4" />
-                      <span className="text-sm text-ink">{task.title}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-ink-muted">
-                      <PriorityDot priority={task.priority} />
-                      <span>{task.estimated_minutes}m</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        {/* Main Split Content Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 items-start">
+          {/* Left Column: Today's Tasks */}
+          <div className="lg:col-span-2 bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col h-full justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CheckSquare size={18} className="text-primary" />
+                  <h2 className="font-display font-semibold text-ink text-base">
+                    Today's Priority Tasks
+                  </h2>
+                </div>
+                <span className="text-xs text-ink-muted font-medium bg-canvas border border-border px-2.5 py-0.5 rounded-md">
+                  {data.today_tasks.length} items
+                </span>
+              </div>
 
-          {/* Right column */}
-          <div className="flex flex-col gap-6">
-            <div className="bg-surface border border-border rounded-lg p-5">
-              <h2 className="font-display font-semibold text-ink mb-3">
-                Assigned Mentor
-              </h2>
-              {data.mentor.full_name ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    {data.mentor.full_name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-ink">
-                      {data.mentor.full_name}
-                    </p>
-                    <div className="flex gap-2 mt-1">
-                      <button className="flex items-center gap-1 text-xs border border-border rounded px-2 py-1 text-ink">
-                        <MessageSquare size={12} /> Message
-                      </button>
-                      <button className="flex items-center gap-1 text-xs bg-primary text-white rounded px-2 py-1">
-                        <CalendarPlus size={12} /> Schedule
-                      </button>
-                    </div>
-                  </div>
+              {data.today_tasks.length === 0 ? (
+                <div className="bg-canvas/50 border border-border/80 rounded-xl p-8 text-center space-y-2 my-2">
+                  <CheckCircle2 size={24} className="text-primary mx-auto" />
+                  <p className="text-xs sm:text-sm font-semibold text-ink">
+                    All clear for today!
+                  </p>
+                  <p className="text-xs text-ink-muted max-w-xs mx-auto">
+                    You have no outstanding onboarding tasks scheduled for today.
+                  </p>
                 </div>
               ) : (
-                <p className="text-sm text-ink-muted">
-                  No mentor assigned yet.
-                </p>
+                <div className="divide-y divide-border/60">
+                  {data.today_tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4 hover:bg-canvas/30 rounded-xl px-2 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded text-primary focus:ring-primary/20 border-border shrink-0 cursor-pointer"
+                        />
+                        <span className="text-xs sm:text-sm font-medium text-ink truncate">
+                          {task.title}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0 text-xs">
+                        <PriorityPill priority={task.priority} />
+                        <span className="flex items-center gap-1 text-ink-muted bg-canvas border border-border/60 px-2 py-0.5 rounded-md text-[11px]">
+                          <Clock size={11} /> {task.estimated_minutes}m
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 
-            <div className="bg-surface border border-border rounded-lg p-5">
-              <h2 className="font-display font-semibold text-ink mb-3">
-                Recent Announcements
-              </h2>
-              {data.recent_announcements.length === 0 ? (
-                <p className="text-sm text-ink-muted">No announcements yet.</p>
+            <div className="pt-4 mt-6 border-t border-border flex justify-end">
+              <Link
+                to="/developer/checklist"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+              >
+                View full onboarding checklist
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Column: Mentor & Announcements */}
+          <div className="flex flex-col gap-6">
+            {/* Mentor Card */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display font-semibold text-ink text-sm uppercase tracking-wider">
+                  Assigned Mentor
+                </h2>
+              </div>
+
+              {data.mentor.full_name ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center text-primary text-base font-bold shrink-0">
+                      {data.mentor.full_name.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-ink truncate">
+                        {data.mentor.full_name}
+                      </p>
+                      <p className="text-xs text-ink-muted">
+                        Senior Developer Lead
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      to="/developer/mentor"
+                      className="flex items-center justify-center gap-1.5 text-xs font-semibold bg-canvas border border-border hover:bg-border/40 text-ink py-2 rounded-xl transition-all"
+                    >
+                      <MessageSquare size={13} /> Message
+                    </Link>
+                    <Link
+                      to="/developer/mentor"
+                      className="flex items-center justify-center gap-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-white py-2 rounded-xl transition-all shadow-xs"
+                    >
+                      <CalendarPlus size={13} /> Schedule
+                    </Link>
+                  </div>
+                </div>
               ) : (
-                <ul className="flex flex-col gap-2">
-                  {data.recent_announcements.map((a) => (
-                    <li key={a.id} className="flex items-start gap-2">
-                      <span
-                        className={`mt-1.5 w-1.5 h-1.5 rounded-full ${a.is_read ? "bg-border" : "bg-primary"}`}
-                      />
-                      <span className="text-sm text-ink">{a.title}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="bg-canvas/50 border border-border/80 rounded-xl p-4 text-center">
+                  <p className="text-xs text-ink-muted">
+                    No mentor assigned to your profile yet.
+                  </p>
+                </div>
               )}
+            </div>
+
+            {/* Recent Announcements */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-xs space-y-3 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Bell size={16} className="text-primary" />
+                    <h2 className="font-display font-semibold text-ink text-sm uppercase tracking-wider">
+                      Announcements
+                    </h2>
+                  </div>
+                </div>
+
+                {data.recent_announcements.length === 0 ? (
+                  <p className="text-xs text-ink-muted italic py-2">
+                    No recent announcements posted.
+                  </p>
+                ) : (
+                  <ul className="space-y-2.5">
+                    {data.recent_announcements.map((a) => (
+                      <li
+                        key={a.id}
+                        className="flex items-start gap-2.5 group cursor-pointer"
+                      >
+                        <span
+                          className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                            a.is_read ? "bg-border" : "bg-primary"
+                          }`}
+                        />
+                        <span className="text-xs sm:text-sm text-ink group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                          {a.title}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="pt-3 border-t border-border">
+                <Link
+                  to="/developer/announcements"
+                  className="inline-flex items-center justify-between w-full text-xs font-semibold text-ink-muted hover:text-primary transition-colors"
+                >
+                  <span>All announcements</span>
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -164,38 +326,60 @@ export default function DashboardPage() {
   );
 }
 
+/* Stat Card Helper Component */
 function StatCard({
-  icon,
+  icon: Icon,
   label,
   value,
+  subtext,
+  color,
 }: {
-  icon: React.ReactNode;
+  icon: React.ElementType;
   label: string;
   value: number;
+  subtext: string;
+  color: "primary" | "emerald" | "amber";
 }) {
+  const colorMap = {
+    primary: "bg-primary/10 text-primary border-primary/20",
+    emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    amber: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  };
+
   return (
-    <div className="bg-surface border border-border rounded-lg p-4 flex items-center justify-between">
-      <div>
-        <p className="text-xs text-ink-muted">{label}</p>
-        <p className="text-xl font-semibold text-ink mt-1">{value}</p>
+    <div className="bg-surface border border-border rounded-2xl p-5 shadow-xs flex items-center justify-between gap-4 hover:border-primary/40 transition-colors">
+      <div className="space-y-1 min-w-0">
+        <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider truncate">
+          {label}
+        </p>
+        <p className="text-2xl font-bold font-display text-ink">{value}</p>
+        <p className="text-[11px] text-ink-muted/80 truncate">{subtext}</p>
       </div>
-      <div className="text-ink-muted">{icon}</div>
+
+      <div
+        className={`w-11 h-11 rounded-2xl border flex items-center justify-center shrink-0 ${colorMap[color]}`}
+      >
+        <Icon size={20} />
+      </div>
     </div>
   );
 }
 
-function PriorityDot({ priority }: { priority: string }) {
-  const colors: Record<string, string> = {
-    high: "bg-danger",
-    medium: "bg-primary",
-    low: "bg-ink-muted",
+/* Priority Badge Component */
+function PriorityPill({ priority }: { priority: string }) {
+  const styles: Record<string, string> = {
+    high: "bg-danger/10 text-danger border-danger/20",
+    medium: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    low: "bg-canvas text-ink-muted border-border",
   };
+
   return (
-    <span className="flex items-center gap-1">
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${colors[priority] ?? "bg-ink-muted"}`}
-      />
-      <span className="capitalize">{priority}</span>
+    <span
+      className={`inline-block px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${
+        styles[priority] ?? styles.low
+      }`}
+    >
+      {priority}
     </span>
   );
 }

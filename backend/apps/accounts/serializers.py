@@ -1,3 +1,5 @@
+import phonenumbers
+from phonenumbers import NumberParseException, PhoneNumberFormat
 from rest_framework import serializers
 from django.utils.text import slugify
 from .models import User
@@ -48,15 +50,76 @@ class ActivateAccountSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, write_only=True)
 
 
+def validate_phone_number(value):
+    try:
+        phone_number = phonenumbers.parse(value, None)
+
+        if not phonenumbers.is_valid_number(phone_number):
+            raise serializers.ValidationError(
+                "Enter a valid phone number."
+            )
+
+        return value
+
+    except phonenumbers.NumberParseException:
+        raise serializers.ValidationError(
+            "Enter a valid phone number."
+        )
+
+
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'full_name', 'role', 'status', 'job_role',
-            'department', 'team', 'manager', 'mentor', 'start_date',
-            'phone', 'created_at',
+            'id',
+            'email',
+            'full_name',
+            'role',
+            'status',
+            'job_role',
+            'department',
+            'team',
+            'manager',
+            'mentor',
+            'start_date',
+            'phone',
+            'created_at',
         ]
-        read_only_fields = ['id', 'status', 'created_at']
+        read_only_fields = [
+            'id',
+            'status',
+            'created_at',
+        ]
+
+    def validate_phone(self, value):
+        """
+        Validate and normalize phone numbers.
+
+        - Phone number is optional.
+        - If provided, it must be a valid international number.
+        - It is always stored in E.164 format.
+        """
+
+        if not value:
+            return ""
+
+        try:
+            phone = phonenumbers.parse(value, None)
+        except NumberParseException:
+            raise serializers.ValidationError(
+                "Please enter a valid international phone number."
+            )
+
+        if not phonenumbers.is_valid_number(phone):
+            raise serializers.ValidationError(
+                "Please enter a valid phone number."
+            )
+
+        return phonenumbers.format_number(
+            phone,
+            PhoneNumberFormat.E164,
+        )
 
 
 class RequestPasswordResetSerializer(serializers.Serializer):
@@ -66,3 +129,14 @@ class RequestPasswordResetSerializer(serializers.Serializer):
 class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField()
     new_password = serializers.CharField(min_length=8)
+    
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(
+        write_only=True,
+        trim_whitespace=False,
+    )
+    new_password = serializers.CharField(
+        min_length=8,
+        write_only=True,
+        trim_whitespace=False,
+    )

@@ -46,8 +46,10 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=150)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='developer')
-    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='pending_invitation')
+    role = models.CharField(
+        max_length=20, choices=ROLE_CHOICES, default='developer')
+    status = models.CharField(
+        max_length=25, choices=STATUS_CHOICES, default='pending_invitation')
     job_role = models.CharField(max_length=100, blank=True)
 
     department = models.ForeignKey(
@@ -65,24 +67,34 @@ class User(AbstractUser):
 
     start_date = models.DateField(null=True, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    phone = models.CharField(max_length=30, blank=True)
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []  # email + password are required by default; nothing extra needed at createsuperuser time
+    # email + password are required by default; nothing extra needed at createsuperuser time
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
     def __str__(self):
         return f"{self.full_name} ({self.email})"
-    
+
+
 class Invitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='invitation')
-    invited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='sent_invitations')
-    onboarding_template = models.ForeignKey('onboarding.OnboardingTemplate', on_delete=models.PROTECT)
-    token = models.CharField(max_length=64, unique=True, db_index=True, blank=True)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='invitation')
+    invited_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name='sent_invitations')
+    onboarding_template = models.ForeignKey(
+        'onboarding.OnboardingTemplate', on_delete=models.PROTECT)
+    token = models.CharField(max_length=64, unique=True,
+                             db_index=True, blank=True)
     expires_at = models.DateTimeField(blank=True)
     accepted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -102,11 +114,14 @@ class Invitation(models.Model):
 
     def __str__(self):
         return f"Invitation for {self.user.email}"
-    
+
+
 class PasswordResetToken(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reset_tokens')
-    token = models.CharField(max_length=64, unique=True, db_index=True, blank=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reset_tokens')
+    token = models.CharField(max_length=64, unique=True,
+                             db_index=True, blank=True)
     expires_at = models.DateTimeField(blank=True)
     used_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -115,7 +130,8 @@ class PasswordResetToken(models.Model):
         if not self.token:
             self.token = secrets.token_urlsafe(48)
         if not self.expires_at:
-            self.expires_at = timezone.now() + timedelta(hours=1)  # much shorter than invitation's 7 days
+            # much shorter than invitation's 7 days
+            self.expires_at = timezone.now() + timedelta(hours=1)
         super().save(*args, **kwargs)
 
     def is_valid(self):

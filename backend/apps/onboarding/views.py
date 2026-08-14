@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import SendBackTaskSerializer
 from .services import submit_task_for_verification, verify_task, send_back_task
 from apps.accounts.permissions import IsManagerOfDeveloper
+from apps.accounts.models import User
 from .services import complete_task
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -94,3 +95,28 @@ class SendBackJourneyTaskView(APIView):
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'message': 'Task sent back to developer.'})
+    
+class DeveloperJourneyDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        developer = get_object_or_404(User, id=user_id, role='developer')
+
+        is_their_manager = request.user.role == 'manager' and developer.manager_id == request.user.id
+        is_hr_or_admin = request.user.role in ('hr', 'admin')
+
+        if not (is_their_manager or is_hr_or_admin):
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        journey = DeveloperJourney.objects.filter(developer=developer).first()
+
+        return Response({
+            'developer': {
+                'id': developer.id,
+                'full_name': developer.full_name,
+                'email': developer.email,
+                'job_role': developer.job_role,
+                'start_date': developer.start_date,
+            },
+            'journey': DeveloperJourneySerializer(journey).data if journey else None,
+        })

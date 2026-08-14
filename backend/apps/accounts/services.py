@@ -1,6 +1,8 @@
 from django.utils import timezone
 from .models import User, Invitation, PasswordResetToken
 from apps.onboarding.services import clone_template_to_journey
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 def invite_developer(*, full_name, email, department, team, job_role,
@@ -92,5 +94,33 @@ def reset_password(*, token, new_password):
 
     reset_token.used_at = timezone.now()
     reset_token.save()
+
+    return user
+
+def change_password(*, user, current_password, new_password):
+    """
+    Change the password for an authenticated user.
+
+    Steps:
+    1. Verify the current password.
+    2. Validate the new password using Django's password validators.
+    3. Save the new password.
+    """
+
+    if not user.check_password(current_password):
+        raise ValueError("Your current password is incorrect.")
+
+    if current_password == new_password:
+        raise ValueError(
+            "Your new password must be different from your current password."
+        )
+
+    try:
+        validate_password(new_password, user)
+    except ValidationError as e:
+        raise ValueError(e.messages[0])
+
+    user.set_password(new_password)
+    user.save()
 
     return user

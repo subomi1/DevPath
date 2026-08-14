@@ -1,5 +1,13 @@
-from .serializers import RequestPasswordResetSerializer, ResetPasswordSerializer
-from .services import request_password_reset, reset_password
+from .serializers import (
+    RequestPasswordResetSerializer,
+    ResetPasswordSerializer,
+    ChangePasswordSerializer,
+)
+from .services import (
+    request_password_reset,
+    reset_password,
+    change_password,
+)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -82,6 +90,30 @@ class MeView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+    
+    
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            change_password(
+                user=request.user,
+                **serializer.validated_data,
+            )
+        except ValueError as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"message": "Password changed successfully."},
+            status=status.HTTP_200_OK,
+        )
 
 
 class RequestPasswordResetView(APIView):

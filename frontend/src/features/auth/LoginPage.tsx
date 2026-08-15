@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import Logo from "../../../public/zone.png";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -59,7 +60,7 @@ export default function LoginPage() {
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary font-display font-bold text-base shadow-inner mb-3">
-            AZ
+            <img src={Logo} alt="" />
           </div>
           <h1 className="font-display text-xl sm:text-2xl font-bold text-ink tracking-tight">
             AppZone Portal

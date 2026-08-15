@@ -76,12 +76,12 @@ export function Sidebar({
       >
         {/* Brand Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-canvas border border-border/60 flex items-center justify-center p-1.5 overflow-hidden shrink-0 shadow-xs">
+          <div className="flex items-center gap-2">
+            <div className="h-11 w-11 rounded-xl bg-canvas border border-border/60 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
               <img
                 src={logo}
                 alt="Zone logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full"
               />
             </div>
             <span className="font-display font-bold text-lg text-ink tracking-tight">

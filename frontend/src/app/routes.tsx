@@ -12,6 +12,7 @@ import AnnouncementsPage from "../features/developer/AnnouncementsPage";
 import ProfilePage from "../features/developer/ProfilePage";
 import ManagerDashboardPage from "../features/manager/DashboardPage";
 import DeveloperDetailPage from "../features/manager/DeveloperDetailPage";
+import ApprovalsPage from "../features/manager/ApprovalsPage";
 
 export function AppRoutes() {
   return (
@@ -95,6 +96,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <DeveloperDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/approvals"
+          element={
+            <ProtectedRoute>
+              <ApprovalsPage />
             </ProtectedRoute>
           }
         />

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, UserPlus, Users, Loader2, Sparkles } from 'lucide-react'
+import { Search, UserPlus, Users, Loader2, Sparkles, Briefcase, Calendar } from 'lucide-react'
 import { AppShell } from '../../layouts/AppShell'
 import { useDevelopers } from '../../hooks/useDevelopers'
 
@@ -48,7 +48,7 @@ export default function DevelopersPage() {
 
   return (
     <AppShell title="Developers">
-      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full min-h-[calc(100vh-4rem)] space-y-6">
+      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto w-full min-h-[calc(100vh-4rem)] space-y-6">
         {/* Page Header */}
         <div className="bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -93,7 +93,7 @@ export default function DevelopersPage() {
           )}
         </div>
 
-        {/* Table Container */}
+        {/* Data Container */}
         <div className="bg-surface border border-border rounded-2xl shadow-xs overflow-hidden">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 text-ink-muted space-y-3">
@@ -101,51 +101,104 @@ export default function DevelopersPage() {
               <p className="text-xs font-medium">Loading developers...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs sm:text-sm">
-                <thead>
-                  <tr className="bg-canvas/60 border-b border-border/80 text-[11px] font-semibold text-ink-muted uppercase tracking-wider">
-                    <th className="px-5 py-3.5">Developer</th>
-                    <th className="px-5 py-3.5">Job Role</th>
-                    <th className="px-5 py-3.5">Status</th>
-                    <th className="px-5 py-3.5">Start Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {developers?.map((dev) => (
-                    <tr
-                      key={dev.id}
-                      className="hover:bg-canvas/40 transition-colors group"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
-                            {dev.full_name?.charAt(0)?.toUpperCase() || '?'}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-ink truncate">
-                              {dev.full_name}
-                            </p>
-                            <p className="text-xs text-ink-muted truncate">
-                              {dev.email}
-                            </p>
-                          </div>
+            <>
+              {/* Mobile Card View (Hidden on medium screens and above) */}
+              <div className="block md:hidden divide-y divide-border/60">
+                {developers?.map((dev) => (
+                  <div key={dev.id} className="p-4 space-y-3.5 hover:bg-canvas/30 transition-colors">
+                    {/* Developer Info & Status */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs">
+                          {dev.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </div>
-                      </td>
-                      <td className="px-5 py-4 font-medium text-ink/80">
-                        {dev.job_role || '—'}
-                      </td>
-                      <td className="px-5 py-4">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-ink text-sm break-words">
+                            {dev.full_name}
+                          </p>
+                          <p className="text-xs text-ink-muted break-words">
+                            {dev.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="shrink-0">
                         <StatusPill status={dev.status} />
-                      </td>
-                      <td className="px-5 py-4 font-medium text-ink-muted">
-                        {dev.start_date || '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
 
+                    {/* Meta Details Box */}
+                    <div className="grid grid-cols-2 gap-2 bg-canvas/60 border border-border/60 rounded-xl p-3 text-xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 text-ink-muted font-medium text-[11px]">
+                          <Briefcase size={12} />
+                          Job Role
+                        </div>
+                        <p className="font-semibold text-ink/90 break-words">
+                          {dev.job_role || '—'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 text-ink-muted font-medium text-[11px]">
+                          <Calendar size={12} />
+                          Start Date
+                        </div>
+                        <p className="font-semibold text-ink/90 break-words">
+                          {dev.start_date || '—'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View (Hidden on mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm">
+                  <thead>
+                    <tr className="bg-canvas/60 border-b border-border/80 text-[11px] font-semibold text-ink-muted uppercase tracking-wider">
+                      <th className="px-5 py-3.5">Developer</th>
+                      <th className="px-5 py-3.5">Job Role</th>
+                      <th className="px-5 py-3.5">Status</th>
+                      <th className="px-5 py-3.5">Start Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {developers?.map((dev) => (
+                      <tr
+                        key={dev.id}
+                        className="hover:bg-canvas/40 transition-colors group"
+                      >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                              {dev.full_name?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-ink truncate">
+                                {dev.full_name}
+                              </p>
+                              <p className="text-xs text-ink-muted truncate">
+                                {dev.email}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 font-medium text-ink/80">
+                          {dev.job_role || '—'}
+                        </td>
+                        <td className="px-5 py-4">
+                          <StatusPill status={dev.status} />
+                        </td>
+                        <td className="px-5 py-4 font-medium text-ink-muted">
+                          {dev.start_date || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Empty State */}
               {developers?.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-16 px-4 text-center space-y-3">
                   <div className="w-12 h-12 bg-canvas border border-border rounded-2xl flex items-center justify-center text-ink-muted shadow-2xs">
@@ -172,7 +225,7 @@ export default function DevelopersPage() {
                   )}
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>

@@ -11,8 +11,11 @@ import {
   X,
   Users,
   ClipboardCheck,
-  UserPlus, 
+  UserPlus,
   FileText,
+  Building2,
+  Settings,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import logo from "../../public/zone.png";
@@ -21,7 +24,11 @@ const developerNav = [
   { to: "/developer/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/developer/journey", label: "My Journey", icon: RouteIcon },
   { to: "/developer/knowledge-base", label: "Knowledge Base", icon: BookOpen },
-  { to: "/developer/access-requests", label: "Access Requests", icon: KeyRound },
+  {
+    to: "/developer/access-requests",
+    label: "Access Requests",
+    icon: KeyRound,
+  },
   { to: "/developer/mentor", label: "My Mentor", icon: Heart },
   { to: "/developer/announcements", label: "Announcements", icon: Megaphone },
   { to: "/developer/profile", label: "Profile", icon: User },
@@ -44,10 +51,21 @@ const hrNav = [
   { to: "/hr/profile", label: "Profile", icon: User },
 ];
 
+const adminNav = [
+  { to: "/admin/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { to: "/admin/users", label: "Users & Roles", icon: ShieldCheck },
+  { to: "/admin/departments", label: "Departments & Teams", icon: Building2 },
+  { to: "/admin/templates", label: "Onboarding Templates", icon: FileText },
+  { to: "/admin/knowledge-base", label: "Knowledge Base", icon: BookOpen },
+  { to: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { to: "/admin/settings", label: "System Settings", icon: Settings },
+];
+
 const navByRole: Record<string, typeof developerNav> = {
   developer: developerNav,
   manager: managerNav,
   hr: hrNav,
+  admin: adminNav,
 };
 
 export function Sidebar({
@@ -90,11 +108,7 @@ export function Sidebar({
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
           <div className="flex items-center gap-2">
             <div className="h-11 w-11 rounded-xl bg-canvas border border-border/60 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
-              <img
-                src={logo}
-                alt="Zone logo"
-                className="w-full h-full"
-              />
+              <img src={logo} alt="Zone logo" className="w-full h-full" />
             </div>
             <span className="font-display font-bold text-lg text-ink tracking-tight">
               Zone
@@ -130,7 +144,9 @@ export function Sidebar({
                   <Icon
                     size={18}
                     className={`shrink-0 transition-colors ${
-                      isActive ? "text-primary" : "text-ink-muted group-hover:text-ink"
+                      isActive
+                        ? "text-primary"
+                        : "text-ink-muted group-hover:text-ink"
                     }`}
                   />
                   <span className="truncate">{label}</span>

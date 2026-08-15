@@ -6,13 +6,11 @@ import {
   RotateCcw,
   XCircle,
   Clock,
-  Sparkles,
-  AlertCircle,
   X,
   Loader2,
   CheckCircle2,
-  FileText,
   User,
+  Inbox,
 } from "lucide-react";
 import { AppShell } from "../../layouts/AppShell";
 import {
@@ -33,6 +31,7 @@ export default function ApprovalsPage() {
   const approveRequest = useApproveAccessRequest();
   const rejectRequest = useRejectAccessRequest();
 
+  const [activeTab, setActiveTab] = useState<"all" | "tasks" | "access">("all");
   const [reasonFor, setReasonFor] = useState<{
     type: "task" | "access";
     id: string;
@@ -45,7 +44,9 @@ export default function ApprovalsPage() {
       (r) => r.status === "submitted" || r.status === "under_review"
     ) ?? [];
 
-  const totalPending = (tasks?.length ?? 0) + pendingAccessRequests.length;
+  const taskCount = tasks?.length ?? 0;
+  const requestCount = pendingAccessRequests.length;
+  const totalPending = taskCount + requestCount;
   const isLoading = tasksLoading || requestsLoading;
 
   const handleSendBack = async () => {
@@ -66,11 +67,12 @@ export default function ApprovalsPage() {
 
   return (
     <AppShell title="Approvals">
-      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6 min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto w-full space-y-6 min-h-[calc(100vh-4rem)]">
+        
         {/* Page Header */}
-        <div className="bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-surface border border-border rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="font-display text-xl sm:text-2xl font-bold text-ink tracking-tight">
                 Pending Approvals
               </h1>
@@ -84,17 +86,51 @@ export default function ApprovalsPage() {
               Review task completions and resource access requests submitted by your team members.
             </p>
           </div>
+
+          {/* Segmented Tab Controls */}
+          {totalPending > 0 && (
+            <div className="flex items-center bg-canvas border border-border p-1 rounded-xl self-start sm:self-center shrink-0 w-full sm:w-auto">
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  activeTab === "all"
+                    ? "bg-surface text-ink shadow-xs"
+                    : "text-ink-muted hover:text-ink"
+                }`}
+              >
+                All ({totalPending})
+              </button>
+              <button
+                onClick={() => setActiveTab("tasks")}
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  activeTab === "tasks"
+                    ? "bg-surface text-ink shadow-xs"
+                    : "text-ink-muted hover:text-ink"
+                }`}
+              >
+                Tasks ({taskCount})
+              </button>
+              <button
+                onClick={() => setActiveTab("access")}
+                className={`flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  activeTab === "access"
+                    ? "bg-surface text-ink shadow-xs"
+                    : "text-ink-muted hover:text-ink"
+                }`}
+              >
+                Access ({requestCount})
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content Body */}
         {isLoading ? (
-          /* Loading Skeletons */
-          <div className="space-y-6">
-            <div className="h-48 bg-surface border border-border rounded-2xl animate-pulse" />
-            <div className="h-48 bg-surface border border-border rounded-2xl animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="h-44 bg-surface border border-border rounded-2xl animate-pulse" />
+            <div className="h-44 bg-surface border border-border rounded-2xl animate-pulse" />
           </div>
         ) : totalPending === 0 ? (
-          /* Empty State */
           <div className="bg-surface border border-border rounded-2xl p-10 text-center shadow-xs space-y-3 my-auto flex-1 flex flex-col items-center justify-center">
             <div className="w-14 h-14 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-500/20">
               <CheckCircle2 size={28} />
@@ -109,50 +145,54 @@ export default function ApprovalsPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 flex-1">
-            {/* Task Verifications Queue */}
-            {(tasks?.length ?? 0) > 0 && (
-              <div className="bg-surface border border-border rounded-2xl shadow-xs overflow-hidden">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-surface">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert size={18} className="text-primary" />
-                    <h2 className="font-display font-semibold text-ink text-base">
-                      Task Verifications
-                    </h2>
-                  </div>
-                  <span className="text-xs text-ink-muted font-medium bg-canvas border border-border px-2.5 py-0.5 rounded-md">
-                    {tasks?.length} items
+          <div className="space-y-8 flex-1">
+            
+            {/* Task Verifications Section */}
+            {(activeTab === "all" || activeTab === "tasks") && taskCount > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <ShieldAlert size={18} className="text-primary" />
+                  <h2 className="font-display font-semibold text-ink text-base">
+                    Task Verifications
+                  </h2>
+                  <span className="text-xs text-ink-muted font-medium bg-surface border border-border px-2 py-0.5 rounded-md ml-auto">
+                    {taskCount}
                   </span>
                 </div>
 
-                <div className="divide-y divide-border/60">
+                {/* Grid Layout for Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {tasks?.map((task) => (
                     <div
                       key={task.id}
-                      className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-canvas/30 transition-colors"
+                      className="bg-surface border border-border rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between gap-4 hover:border-border/80 transition-all"
                     >
-                      <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-9 h-9 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary text-xs font-bold shrink-0 mt-0.5">
-                          {task.developer_name?.charAt(0) ?? "D"}
-                        </div>
-                        <div className="space-y-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-semibold text-ink leading-snug">
-                            {task.title}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-                            <span className="flex items-center gap-1 font-medium text-ink/90">
-                              <User size={12} className="text-ink-muted" />
+                      <div className="space-y-3">
+                        {/* Requester Header */}
+                        <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                              {task.developer_name?.charAt(0) ?? "D"}
+                            </div>
+                            <span className="text-xs font-semibold text-ink truncate">
                               {task.developer_name}
                             </span>
-                            <span>·</span>
-                            <span className="bg-canvas border border-border px-2 py-0.5 rounded-md text-[11px] font-semibold capitalize">
-                              {task.category}
-                            </span>
                           </div>
+                          <span className="bg-canvas border border-border px-2 py-0.5 rounded-md text-[11px] font-semibold text-ink-muted capitalize shrink-0">
+                            {task.category}
+                          </span>
+                        </div>
+
+                        {/* Task Title Box */}
+                        <div className="bg-canvas/60 border border-border/60 rounded-xl p-3">
+                          <p className="text-xs sm:text-sm font-medium text-ink leading-relaxed break-words">
+                            {task.title}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                      {/* Touch-Friendly Action Footer */}
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/60">
                         <button
                           onClick={() =>
                             setReasonFor({
@@ -161,15 +201,15 @@ export default function ApprovalsPage() {
                               title: task.title,
                             })
                           }
-                          className="inline-flex items-center gap-1 text-xs font-semibold border border-border bg-surface hover:bg-canvas text-ink px-3 py-2 rounded-xl transition-all shadow-xs"
+                          className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold border border-border bg-surface hover:bg-canvas text-ink py-2.5 rounded-xl transition-all shadow-xs"
                         >
                           <RotateCcw size={13} className="text-ink-muted" />
-                          Send back
+                          Send Back
                         </button>
                         <button
                           disabled={verifyTask.isPending}
                           onClick={() => verifyTask.mutate(task.id)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold bg-primary hover:bg-primary/90 text-white px-3.5 py-2 rounded-xl transition-all shadow-xs disabled:opacity-50"
+                          className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-white py-2.5 rounded-xl transition-all shadow-xs disabled:opacity-50"
                         >
                           {verifyTask.isPending ? (
                             <Loader2 size={13} className="animate-spin" />
@@ -185,48 +225,57 @@ export default function ApprovalsPage() {
               </div>
             )}
 
-            {/* Access Requests Queue */}
-            {pendingAccessRequests.length > 0 && (
-              <div className="bg-surface border border-border rounded-2xl shadow-xs overflow-hidden">
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-surface">
-                  <div className="flex items-center gap-2">
-                    <KeyRound size={18} className="text-amber-500" />
-                    <h2 className="font-display font-semibold text-ink text-base">
-                      Access Requests
-                    </h2>
-                  </div>
-                  <span className="text-xs text-ink-muted font-medium bg-canvas border border-border px-2.5 py-0.5 rounded-md">
-                    {pendingAccessRequests.length} requests
+            {/* Access Requests Section */}
+            {(activeTab === "all" || activeTab === "access") && requestCount > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 px-1">
+                  <KeyRound size={18} className="text-amber-500" />
+                  <h2 className="font-display font-semibold text-ink text-base">
+                    Access Requests
+                  </h2>
+                  <span className="text-xs text-ink-muted font-medium bg-surface border border-border px-2 py-0.5 rounded-md ml-auto">
+                    {requestCount}
                   </span>
                 </div>
 
-                <div className="divide-y divide-border/60">
+                {/* Grid Layout for Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pendingAccessRequests.map((req) => (
                     <div
                       key={req.id}
-                      className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-canvas/30 transition-colors"
+                      className="bg-surface border border-border rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col justify-between gap-4 hover:border-border/80 transition-all"
                     >
-                      <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-9 h-9 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-center text-amber-600 text-xs font-bold shrink-0 mt-0.5">
-                          {req.developer_name?.charAt(0) ?? "D"}
-                        </div>
-                        <div className="space-y-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-semibold text-ink leading-snug">
-                            {req.resource_display}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-                            <span className="font-medium text-ink/90">
+                      <div className="space-y-3">
+                        {/* Requester Header */}
+                        <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-center text-amber-600 text-xs font-bold shrink-0">
+                              {req.developer_name?.charAt(0) ?? "D"}
+                            </div>
+                            <span className="text-xs font-semibold text-ink truncate">
                               {req.developer_name}
                             </span>
-                            <span>·</span>
-                            <span className="text-ink-muted italic truncate max-w-xs sm:max-w-md">
-                              "{req.justification}"
-                            </span>
                           </div>
+                          <span className="bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-md text-[11px] font-semibold shrink-0">
+                            Access Request
+                          </span>
+                        </div>
+
+                        {/* Resource & Justification Box */}
+                        <div className="bg-canvas/60 border border-border/60 rounded-xl p-3 space-y-2">
+                          <p className="text-xs sm:text-sm font-semibold text-ink break-words">
+                            {req.resource_display}
+                          </p>
+                          {req.justification && (
+                            <p className="text-xs text-ink-muted italic break-words border-l-2 border-border pl-2.5 py-0.5">
+                              "{req.justification}"
+                            </p>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                      {/* Touch-Friendly Action Footer */}
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/60">
                         <button
                           onClick={() =>
                             setReasonFor({
@@ -235,7 +284,7 @@ export default function ApprovalsPage() {
                               title: req.resource_display,
                             })
                           }
-                          className="inline-flex items-center gap-1 text-xs font-semibold border border-danger/30 text-danger hover:bg-danger/10 px-3 py-2 rounded-xl transition-all shadow-xs"
+                          className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold border border-danger/30 text-danger hover:bg-danger/10 py-2.5 rounded-xl transition-all shadow-xs"
                         >
                           <XCircle size={13} />
                           Reject
@@ -243,7 +292,7 @@ export default function ApprovalsPage() {
                         <button
                           disabled={approveRequest.isPending}
                           onClick={() => approveRequest.mutate(req.id)}
-                          className="inline-flex items-center gap-1 text-xs font-semibold bg-primary hover:bg-primary/90 text-white px-3.5 py-2 rounded-xl transition-all shadow-xs disabled:opacity-50"
+                          className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-white py-2.5 rounded-xl transition-all shadow-xs disabled:opacity-50"
                         >
                           {approveRequest.isPending ? (
                             <Loader2 size={13} className="animate-spin" />
@@ -270,7 +319,7 @@ export default function ApprovalsPage() {
             onClick={() => setReasonFor(null)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-surface border border-border rounded-2xl p-6 w-full max-w-md shadow-lg space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="bg-surface border border-border rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-lg space-y-4 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-border pb-3">
                 <h3 className="font-display font-semibold text-ink text-base">
                   {reasonFor.type === "task"
@@ -287,7 +336,7 @@ export default function ApprovalsPage() {
 
               <div className="space-y-1">
                 <p className="text-xs text-ink-muted">Item:</p>
-                <p className="text-xs font-semibold text-ink bg-canvas border border-border/80 p-2.5 rounded-xl truncate">
+                <p className="text-xs font-semibold text-ink bg-canvas border border-border/80 p-2.5 rounded-xl break-words max-h-32 overflow-y-auto">
                   {reasonFor.title}
                 </p>
               </div>
@@ -317,7 +366,7 @@ export default function ApprovalsPage() {
                   onClick={
                     reasonFor.type === "task" ? handleSendBack : handleReject
                   }
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-danger hover:bg-danger/90 text-white px-4 py-2 rounded-xl transition-all shadow-xs disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-danger hover:bg-danger/90 text-white px-4 py-2.5 rounded-xl transition-all shadow-xs disabled:opacity-50"
                 >
                   {isSubmittingReason && (
                     <Loader2 size={13} className="animate-spin" />

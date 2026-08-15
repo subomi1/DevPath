@@ -121,7 +121,7 @@ export default function ProfilePage() {
 
   return (
     <AppShell title="Profile">
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto flex flex-col gap-8">
+      <div className="p-6 lg:p-8 max-w-8xl mx-auto flex flex-col gap-8">
         {/* Header Hero Banner */}
         <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 shadow-sm">
           <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/20 text-primary font-display font-bold text-2xl flex items-center justify-center shrink-0 shadow-inner">

@@ -73,7 +73,7 @@ export default function HRProfilePage() {
 
   return (
     <AppShell title="Profile">
-      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full min-h-[calc(100vh-4rem)] space-y-6">
+      <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto w-full min-h-[calc(100vh-4rem)] space-y-6">
         {/* Profile Hero Header */}
         <div className="bg-surface border border-border rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
           <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center text-primary text-2xl font-bold shrink-0 shadow-xs">

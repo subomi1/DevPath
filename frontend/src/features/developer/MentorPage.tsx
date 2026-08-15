@@ -76,7 +76,7 @@ export default function MentorPage() {
 
   return (
     <AppShell title="My Mentor">
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto space-y-6">
         {/* Mentor Profile Hero Card */}
         <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 min-w-0">

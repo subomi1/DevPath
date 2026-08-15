@@ -134,7 +134,7 @@ export default function AccessRequestsPage() {
 
   return (
     <AppShell title="Access Requests">
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto space-y-6">
         {/* Top Header */}
         <div className="bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>

@@ -22,6 +22,9 @@ import DevelopersPage from "../features/hr/DevelopersPage";
 import TemplatesPage from "../features/hr/TemplatesPage";
 import HRAnnouncementsPage from "../features/hr/AnnouncementsPage";
 import HRProfilePage from "../features/hr/ProfilePage";
+import AdminDashboardPage from "../features/admin/DashboardPage";
+import UsersPage from "../features/admin/UsersPage";
+import DepartmentsPage from "../features/admin/DepartmentsPage";
 
 export function AppRoutes() {
   return (
@@ -185,6 +188,30 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <HRProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/departments"
+          element={
+            <ProtectedRoute>
+              <DepartmentsPage />
             </ProtectedRoute>
           }
         />

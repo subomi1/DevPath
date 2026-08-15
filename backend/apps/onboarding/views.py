@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from .models import DeveloperJourney, JourneyTask, OnboardingTemplate
-from .serializers import DeveloperJourneySerializer, OnboardingTemplateSerializer, SendBackTaskSerializer
+from .models import DeveloperJourney, JourneyTask, OnboardingTemplate, TemplatePhase
+from .serializers import DeveloperJourneySerializer, OnboardingTemplateSerializer, SendBackTaskSerializer, OnboardingTemplateDetailSerializer
 from .services import recalculate_progress, submit_task_for_verification, verify_task, send_back_task, complete_task
 
 
@@ -149,4 +149,29 @@ class OnboardingTemplateListView(APIView):
 
     def get(self, request):
         templates = OnboardingTemplate.objects.filter(is_active=True)
-        return Response(OnboardingTemplateSerializer(templates, many=True).data)
+        return Response(OnboardingTemplateDetailSerializer(templates, many=True).data)
+    
+class OnboardingTemplateDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, template_id):
+        template = get_object_or_404(OnboardingTemplate, id=template_id)
+        phases = TemplatePhase.objects.filter(template=template).prefetch_related('tasks').order_by('order')
+
+        return Response({
+            'id': template.id,
+            'name': template.name,
+            'target_role': template.target_role,
+            'description': template.description,
+            'phases': [
+                {
+                    'id': phase.id,
+                    'name': phase.name,
+                    'tasks': [
+                        {'id': t.id, 'title': t.title, 'category': t.category, 'verification_type': t.verification_type}
+                        for t in phase.tasks.order_by('order')
+                    ],
+                }
+                for phase in phases
+            ],
+        })

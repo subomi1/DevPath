@@ -27,12 +27,31 @@ class DeveloperJourneySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeveloperJourney
-        fields = ['id', 'started_at', 'completed_at', 'overall_progress', 'phases']
-        
+        fields = ['id', 'started_at', 'completed_at',
+                  'overall_progress', 'phases']
+
+
 class SendBackTaskSerializer(serializers.Serializer):
     reason = serializers.CharField()
-    
+
+
 class OnboardingTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnboardingTemplate
         fields = ['id', 'name', 'target_role', 'description', 'is_active']
+
+
+class OnboardingTemplateDetailSerializer(serializers.ModelSerializer):
+    phase_count = serializers.SerializerMethodField()
+    task_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OnboardingTemplate
+        fields = ['id', 'name', 'target_role', 'description',
+                  'is_active', 'phase_count', 'task_count']
+
+    def get_phase_count(self, obj):
+        return obj.phases.count()
+
+    def get_task_count(self, obj):
+        return sum(phase.tasks.count() for phase in obj.phases.all())

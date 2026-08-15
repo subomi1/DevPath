@@ -17,6 +17,8 @@ import TeamPage from "../features/manager/TeamPage";
 import ManagerAnnouncementsPage from "../features/manager/AnnouncementsPage";
 import ManagerProfilePage from "../features/manager/ProfilePage";
 import HRDashboardPage from "../features/hr/DashboardPage";
+import InviteDeveloperPage from "../features/hr/InviteDeveloperPage";
+import DevelopersPage from "../features/hr/DevelopersPage";
 
 export function AppRoutes() {
   return (
@@ -140,6 +142,22 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <HRDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/invite"
+          element={
+            <ProtectedRoute>
+              <InviteDeveloperPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/developers"
+          element={
+            <ProtectedRoute>
+              <DevelopersPage />
             </ProtectedRoute>
           }
         />

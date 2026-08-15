@@ -120,3 +120,26 @@ class DeveloperJourneyDetailView(APIView):
             },
             'journey': DeveloperJourneySerializer(journey).data if journey else None,
         })
+        
+class PendingVerificationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'manager':
+            return Response([])
+
+        tasks = JourneyTask.objects.filter(
+            phase__journey__developer__manager=request.user,
+            status='completed',
+            verification_type='manager_verified',
+        ).select_related('phase__journey__developer')
+
+        data = [{
+            'id': str(t.id),
+            'title': t.title,
+            'category': t.category,
+            'developer_id': str(t.phase.journey.developer.id),
+            'developer_name': t.phase.journey.developer.full_name,
+        } for t in tasks]
+
+        return Response(data)

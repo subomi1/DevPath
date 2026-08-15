@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JourneyTask, JourneyPhase, DeveloperJourney
+from .models import JourneyTask, JourneyPhase, DeveloperJourney, OnboardingTemplate
 
 
 class JourneyTaskSerializer(serializers.ModelSerializer):
@@ -31,3 +31,8 @@ class DeveloperJourneySerializer(serializers.ModelSerializer):
         
 class SendBackTaskSerializer(serializers.Serializer):
     reason = serializers.CharField()
+    
+class OnboardingTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OnboardingTemplate
+        fields = ['id', 'name', 'target_role', 'description', 'is_active']

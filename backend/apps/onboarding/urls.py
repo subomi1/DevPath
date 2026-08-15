@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import MyJourneyView, CompleteJourneyTaskView
-from .views import SubmitJourneyTaskView, VerifyJourneyTaskView, SendBackJourneyTaskView, DeveloperJourneyDetailView, PendingVerificationsView
+from .views import SubmitJourneyTaskView, VerifyJourneyTaskView, SendBackJourneyTaskView, DeveloperJourneyDetailView, PendingVerificationsView, OnboardingTemplateListView
 
 urlpatterns = [
     path('journeys/me/', MyJourneyView.as_view(), name='my-journey'),
@@ -16,4 +16,5 @@ urlpatterns = [
          DeveloperJourneyDetailView.as_view(), name='journey-detail'),
     path('journey-tasks/pending-verification/',
          PendingVerificationsView.as_view(), name='pending-verifications'),
+    path('templates/', OnboardingTemplateListView.as_view(), name='template-list'),
 ]

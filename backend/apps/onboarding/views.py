@@ -1,17 +1,14 @@
 from django.shortcuts import get_object_or_404
-from .serializers import SendBackTaskSerializer
-from .services import submit_task_for_verification, verify_task, send_back_task
 from apps.accounts.permissions import IsManagerOfDeveloper
 from apps.accounts.models import User
-from .services import complete_task
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from .models import DeveloperJourney, JourneyTask
-from .serializers import DeveloperJourneySerializer
-from .services import recalculate_progress
+from .models import DeveloperJourney, JourneyTask, OnboardingTemplate
+from .serializers import DeveloperJourneySerializer, OnboardingTemplateSerializer, SendBackTaskSerializer
+from .services import recalculate_progress, submit_task_for_verification, verify_task, send_back_task, complete_task
 
 
 class MyJourneyView(APIView):
@@ -95,7 +92,8 @@ class SendBackJourneyTaskView(APIView):
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'message': 'Task sent back to developer.'})
-    
+
+
 class DeveloperJourneyDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -120,7 +118,8 @@ class DeveloperJourneyDetailView(APIView):
             },
             'journey': DeveloperJourneySerializer(journey).data if journey else None,
         })
-        
+
+
 class PendingVerificationsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -143,3 +142,11 @@ class PendingVerificationsView(APIView):
         } for t in tasks]
 
         return Response(data)
+
+
+class OnboardingTemplateListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        templates = OnboardingTemplate.objects.filter(is_active=True)
+        return Response(OnboardingTemplateSerializer(templates, many=True).data)

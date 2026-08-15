@@ -19,6 +19,9 @@ import ManagerProfilePage from "../features/manager/ProfilePage";
 import HRDashboardPage from "../features/hr/DashboardPage";
 import InviteDeveloperPage from "../features/hr/InviteDeveloperPage";
 import DevelopersPage from "../features/hr/DevelopersPage";
+import TemplatesPage from "../features/hr/TemplatesPage";
+import HRAnnouncementsPage from "../features/hr/AnnouncementsPage";
+import HRProfilePage from "../features/hr/ProfilePage";
 
 export function AppRoutes() {
   return (
@@ -158,6 +161,30 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <DevelopersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/templates"
+          element={
+            <ProtectedRoute>
+              <TemplatesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/announcements"
+          element={
+            <ProtectedRoute>
+              <HRAnnouncementsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/profile"
+          element={
+            <ProtectedRoute>
+              <HRProfilePage />
             </ProtectedRoute>
           }
         />

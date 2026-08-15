@@ -12,6 +12,8 @@ interface Template {
   name: string
   target_role: string
   description: string
+  phase_count: number
+  task_count: number
 }
 
 export function useManagers() {

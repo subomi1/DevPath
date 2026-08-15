@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import InviteDeveloperView, ActivateAccountView, ValidateInvitationView, MeView, ResetPasswordView, RequestPasswordResetView, ChangePasswordView
+from .views import InviteDeveloperView, ActivateAccountView, ValidateInvitationView, MeView, ResetPasswordView, RequestPasswordResetView, ChangePasswordView, UserListView
 
 urlpatterns = [
     path('invitations/', InviteDeveloperView.as_view(), name='invite-developer'),
@@ -15,4 +15,5 @@ urlpatterns = [
     path('auth/forgot-password/',
          RequestPasswordResetView.as_view(), name='forgot-password'),
     path('auth/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+    path('users/', UserListView.as_view(), name='user-list'),
 ]

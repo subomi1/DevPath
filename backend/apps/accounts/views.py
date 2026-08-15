@@ -18,7 +18,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .permissions import IsAdminOrHR
 from .serializers import InviteDeveloperSerializer, ActivateAccountSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from .services import invite_developer, activate_account
-from .models import Invitation
+from .models import Invitation, User
 
 
 class InviteDeveloperView(APIView):
@@ -138,3 +138,32 @@ class ResetPasswordView(APIView):
         except ValueError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'Password reset. Log in with your new password.'})
+    
+
+class UserListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        role = request.user.role
+
+        if role == 'admin' or role == 'hr':
+            queryset = User.objects.all()
+        elif role == 'manager':
+            queryset = User.objects.filter(manager=request.user)
+        else:
+            # developers shouldn't get a general directory of everyone
+            return Response({'detail': 'You do not have permission to view this.'}, status=status.HTTP_403_FORBIDDEN)
+
+        role_filter = request.query_params.get('role')
+        if role_filter:
+            queryset = queryset.filter(role=role_filter)
+
+        status_filter = request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        search = request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(full_name__icontains=search)
+
+        return Response(UserSerializer(queryset, many=True).data)

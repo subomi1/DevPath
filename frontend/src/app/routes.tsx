@@ -13,6 +13,10 @@ import ProfilePage from "../features/developer/ProfilePage";
 import ManagerDashboardPage from "../features/manager/DashboardPage";
 import DeveloperDetailPage from "../features/manager/DeveloperDetailPage";
 import ApprovalsPage from "../features/manager/ApprovalsPage";
+import TeamPage from "../features/manager/TeamPage";
+import ManagerAnnouncementsPage from "../features/manager/AnnouncementsPage";
+import ManagerProfilePage from "../features/manager/ProfilePage";
+import HRDashboardPage from "../features/hr/DashboardPage";
 
 export function AppRoutes() {
   return (
@@ -104,6 +108,38 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <ApprovalsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/team"
+          element={
+            <ProtectedRoute>
+              <TeamPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/announcements"
+          element={
+            <ProtectedRoute>
+              <ManagerAnnouncementsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/profile"
+          element={
+            <ProtectedRoute>
+              <ManagerProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hr/dashboard"
+          element={
+            <ProtectedRoute>
+              <HRDashboardPage />
             </ProtectedRoute>
           }
         />

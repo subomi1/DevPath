@@ -11,6 +11,8 @@ import {
   X,
   Users,
   ClipboardCheck,
+  UserPlus, 
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import logo from "../../public/zone.png";
@@ -33,9 +35,19 @@ const managerNav = [
   { to: "/manager/profile", label: "Profile", icon: User },
 ];
 
+const hrNav = [
+  { to: "/hr/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { to: "/hr/invite", label: "Invite Developer", icon: UserPlus },
+  { to: "/hr/developers", label: "Developers", icon: Users },
+  { to: "/hr/templates", label: "Onboarding Templates", icon: FileText },
+  { to: "/hr/announcements", label: "Announcements", icon: Megaphone },
+  { to: "/hr/profile", label: "Profile", icon: User },
+];
+
 const navByRole: Record<string, typeof developerNav> = {
   developer: developerNav,
   manager: managerNav,
+  hr: hrNav,
 };
 
 export function Sidebar({

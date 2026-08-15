@@ -5,7 +5,6 @@ import {
   AlertTriangle,
   ClipboardCheck,
   ChevronRight,
-  Sparkles,
   AlertCircle,
   ArrowUpRight,
   UserCheck,

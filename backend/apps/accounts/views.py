@@ -7,15 +7,17 @@ from .services import (
     request_password_reset,
     reset_password,
     change_password,
+    change_user_role, set_user_status
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.shortcuts import get_object_or_404
 
 
-from .permissions import IsAdminOrHR
+from .permissions import IsAdminOrHR, IsAdmin
 from .serializers import InviteDeveloperSerializer, ActivateAccountSerializer, UserSerializer, CustomTokenObtainPairSerializer
 from .services import invite_developer, activate_account
 from .models import Invitation, User
@@ -90,8 +92,8 @@ class MeView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
-    
+
+
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -138,7 +140,7 @@ class ResetPasswordView(APIView):
         except ValueError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'Password reset. Log in with your new password.'})
-    
+
 
 class UserListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -167,3 +169,34 @@ class UserListView(APIView):
             queryset = queryset.filter(full_name__icontains=search)
 
         return Response(UserSerializer(queryset, many=True).data)
+
+
+class ChangeUserRoleView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        new_role = request.data.get('role')
+        try:
+            change_user_role(user=target_user, new_role=new_role)
+        except ValueError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(UserSerializer(target_user).data)
+
+
+class SuspendUserView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        set_user_status(user=target_user, new_status='suspended')
+        return Response(UserSerializer(target_user).data)
+
+
+class ArchiveUserView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        set_user_status(user=target_user, new_status='archived')
+        return Response(UserSerializer(target_user).data)

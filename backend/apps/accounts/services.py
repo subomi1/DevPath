@@ -124,3 +124,20 @@ def change_password(*, user, current_password, new_password):
     user.save()
 
     return user
+
+def change_user_role(*, user, new_role):
+    valid_roles = [r[0] for r in User.ROLE_CHOICES]
+    if new_role not in valid_roles:
+        raise ValueError('Invalid role.')
+    user.role = new_role
+    user.save(update_fields=['role'])
+    return user
+
+
+def set_user_status(*, user, new_status):
+    valid_statuses = [s[0] for s in User.STATUS_CHOICES]
+    if new_status not in valid_statuses:
+        raise ValueError('Invalid status.')
+    user.status = new_status
+    user.save(update_fields=['status'])
+    return user

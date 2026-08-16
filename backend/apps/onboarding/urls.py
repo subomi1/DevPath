@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import MyJourneyView, CompleteJourneyTaskView
-from .views import SubmitJourneyTaskView, VerifyJourneyTaskView, SendBackJourneyTaskView, DeveloperJourneyDetailView, PendingVerificationsView, OnboardingTemplateListView, OnboardingTemplateDetailView
+from .views import SubmitJourneyTaskView, VerifyJourneyTaskView, SendBackJourneyTaskView, DeveloperJourneyDetailView, PendingVerificationsView, OnboardingTemplateListView, OnboardingTemplateDetailView,     OnboardingTemplateCreateView, OnboardingTemplateUpdateView, TemplatePhaseCreateView, TemplatePhaseDetailView, ReorderPhasesView, TemplateTaskCreateView, TemplateTaskDetailView, ReorderTasksView
 
 urlpatterns = [
     path('journeys/me/', MyJourneyView.as_view(), name='my-journey'),
@@ -19,4 +19,20 @@ urlpatterns = [
     path('templates/', OnboardingTemplateListView.as_view(), name='template-list'),
     path('templates/<uuid:template_id>/',
          OnboardingTemplateDetailView.as_view(), name='template-detail'),
+    path('templates/create/', OnboardingTemplateCreateView.as_view(),
+         name='template-create'),
+    path('templates/<uuid:template_id>/update/',
+         OnboardingTemplateUpdateView.as_view(), name='template-update'),
+    path('template-phases/', TemplatePhaseCreateView.as_view(),
+         name='template-phase-create'),
+    path('template-phases/<uuid:phase_id>/',
+         TemplatePhaseDetailView.as_view(), name='template-phase-detail'),
+    path('template-phases/reorder/', ReorderPhasesView.as_view(),
+         name='template-phase-reorder'),
+    path('template-tasks/', TemplateTaskCreateView.as_view(),
+         name='template-task-create'),
+    path('template-tasks/<uuid:task_id>/',
+         TemplateTaskDetailView.as_view(), name='template-task-detail'),
+    path('template-tasks/reorder/', ReorderTasksView.as_view(),
+         name='template-task-reorder'),
 ]

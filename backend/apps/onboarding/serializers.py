@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JourneyTask, JourneyPhase, DeveloperJourney, OnboardingTemplate
+from .models import JourneyTask, JourneyPhase, DeveloperJourney, OnboardingTemplate, TemplatePhase, TemplateTask
 
 
 class JourneyTaskSerializer(serializers.ModelSerializer):
@@ -55,3 +55,27 @@ class OnboardingTemplateDetailSerializer(serializers.ModelSerializer):
 
     def get_task_count(self, obj):
         return sum(phase.tasks.count() for phase in obj.phases.all())
+    
+    
+class OnboardingTemplateWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OnboardingTemplate
+        fields = ['id', 'name', 'target_role', 'description', 'is_active']
+        read_only_fields = ['id']
+
+
+class TemplatePhaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplatePhase
+        fields = ['id', 'template', 'name', 'order']
+        read_only_fields = ['id']
+
+
+class TemplateTaskWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateTask
+        fields = [
+            'id', 'phase', 'title', 'description', 'category', 'priority',
+            'due_offset_days', 'estimated_minutes', 'verification_type', 'order',
+        ]
+        read_only_fields = ['id']

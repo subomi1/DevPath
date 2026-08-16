@@ -160,3 +160,12 @@ def send_back_task(*, task: JourneyTask, reviewed_by, reason):
 
     recalculate_progress(task.phase.journey)
     return task
+
+
+def reorder_items(*, model_class, id_order_pairs):
+    """
+    Generic batch-reorder helper — used for both phases and tasks.
+    id_order_pairs is a list of {"id": ..., "order": ...} dicts.
+    """
+    for pair in id_order_pairs:
+        model_class.objects.filter(id=pair['id']).update(order=pair['order'])

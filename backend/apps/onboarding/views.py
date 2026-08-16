@@ -1,14 +1,14 @@
 from django.shortcuts import get_object_or_404
-from apps.accounts.permissions import IsManagerOfDeveloper
+from apps.accounts.permissions import IsManagerOfDeveloper, IsAdmin
 from apps.accounts.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from .models import DeveloperJourney, JourneyTask, OnboardingTemplate, TemplatePhase
-from .serializers import DeveloperJourneySerializer, OnboardingTemplateSerializer, SendBackTaskSerializer, OnboardingTemplateDetailSerializer
-from .services import recalculate_progress, submit_task_for_verification, verify_task, send_back_task, complete_task
+from .models import DeveloperJourney, JourneyTask, OnboardingTemplate, TemplatePhase, TemplateTask
+from .serializers import DeveloperJourneySerializer, OnboardingTemplateSerializer, SendBackTaskSerializer, OnboardingTemplateDetailSerializer, OnboardingTemplateWriteSerializer, TemplatePhaseSerializer, TemplateTaskWriteSerializer
+from .services import recalculate_progress, submit_task_for_verification, verify_task, send_back_task, complete_task, reorder_items
 
 
 class MyJourneyView(APIView):
@@ -175,3 +175,91 @@ class OnboardingTemplateDetailView(APIView):
                 for phase in phases
             ],
         })
+        
+class OnboardingTemplateCreateView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        serializer = OnboardingTemplateWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class OnboardingTemplateUpdateView(APIView):
+    permission_classes = [IsAdmin]
+
+    def patch(self, request, template_id):
+        template = get_object_or_404(OnboardingTemplate, id=template_id)
+        serializer = OnboardingTemplateWriteSerializer(template, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class TemplatePhaseCreateView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        serializer = TemplatePhaseSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phase = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class TemplatePhaseDetailView(APIView):
+    permission_classes = [IsAdmin]
+
+    def patch(self, request, phase_id):
+        phase = get_object_or_404(TemplatePhase, id=phase_id)
+        serializer = TemplatePhaseSerializer(phase, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, phase_id):
+        phase = get_object_or_404(TemplatePhase, id=phase_id)
+        phase.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReorderPhasesView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        reorder_items(model_class=TemplatePhase, id_order_pairs=request.data)
+        return Response({'message': 'Reordered.'})
+
+
+class TemplateTaskCreateView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        serializer = TemplateTaskWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class TemplateTaskDetailView(APIView):
+    permission_classes = [IsAdmin]
+
+    def patch(self, request, task_id):
+        task = get_object_or_404(TemplateTask, id=task_id)
+        serializer = TemplateTaskWriteSerializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, task_id):
+        task = get_object_or_404(TemplateTask, id=task_id)
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReorderTasksView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        reorder_items(model_class=TemplateTask, id_order_pairs=request.data)
+        return Response({'message': 'Reordered.'})

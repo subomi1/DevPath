@@ -25,6 +25,7 @@ import HRProfilePage from "../features/hr/ProfilePage";
 import AdminDashboardPage from "../features/admin/DashboardPage";
 import UsersPage from "../features/admin/UsersPage";
 import DepartmentsPage from "../features/admin/DepartmentsPage";
+import TemplateBuilderPage from "../features/admin/TemplateBuilderPage";
 
 export function AppRoutes() {
   return (
@@ -212,6 +213,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <DepartmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/templates"
+          element={
+            <ProtectedRoute>
+              <TemplateBuilderPage />
             </ProtectedRoute>
           }
         />

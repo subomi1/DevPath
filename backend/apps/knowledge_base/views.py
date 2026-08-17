@@ -104,3 +104,14 @@ class ArticleAttachmentView(APIView):
         attachment = serializer.save(article=article)
 
         return Response(AttachmentSerializer(attachment).data, status=status.HTTP_201_CREATED)
+    
+class AttachmentDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, attachment_id):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Only admins can delete attachments.'}, status=status.HTTP_403_FORBIDDEN)
+
+        attachment = get_object_or_404(Attachment, id=attachment_id)
+        attachment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

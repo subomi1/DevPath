@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.knowledge_base',
     'apps.announcements',
     'apps.dashboard',
+    'apps.system_settings',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

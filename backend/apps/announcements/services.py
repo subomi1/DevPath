@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.utils import timezone
 from .models import Announcement, AnnouncementRead
+from apps.notifications.services import notify
 
 
 def get_visible_announcements(*, user):
@@ -19,6 +20,41 @@ def get_visible_announcements(*, user):
     ).distinct()
 
 
+def get_audience_users(*, announcement):
+    """
+    The inverse of get_visible_announcements: given an announcement,
+    who is in its audience? Shared by get_read_stats (needs a count)
+    and notify_audience (needs to iterate and notify each one) so the
+    audience-resolution rules only live in one place.
+    """
+    from apps.accounts.models import User
+
+    if announcement.audience_scope == 'all':
+        return User.objects.filter(status='active')
+    elif announcement.audience_scope == 'department':
+        return User.objects.filter(status='active', department=announcement.audience_department)
+    elif announcement.audience_scope == 'team':
+        return User.objects.filter(status='active', team=announcement.audience_team)
+    elif announcement.audience_scope == 'manager_team':
+        return User.objects.filter(status='active', manager=announcement.author)
+    else:
+        return User.objects.none()
+
+
+def notify_audience(*, announcement):
+    """
+    Fans out a notification to everyone in the announcement's resolved
+    audience. Called once, right after publish.
+    """
+    for user in get_audience_users(announcement=announcement).exclude(id=announcement.author_id):
+        notify(
+            recipient=user,
+            category='announcement',
+            title=announcement.title,
+            object_id=announcement.id,
+        )
+
+
 def mark_as_read(*, announcement, user):
     AnnouncementRead.objects.get_or_create(announcement=announcement, user=user)
 
@@ -28,18 +64,7 @@ def get_read_stats(*, announcement):
     Used by the Admin read-rate view: how many people in the resolved
     audience have actually read this, as a percentage.
     """
-    from apps.accounts.models import User
-
-    if announcement.audience_scope == 'all':
-        audience = User.objects.filter(status='active')
-    elif announcement.audience_scope == 'department':
-        audience = User.objects.filter(status='active', department=announcement.audience_department)
-    elif announcement.audience_scope == 'team':
-        audience = User.objects.filter(status='active', team=announcement.audience_team)
-    elif announcement.audience_scope == 'manager_team':
-        audience = User.objects.filter(status='active', manager=announcement.author)
-    else:
-        audience = User.objects.none()
+    audience = get_audience_users(announcement=announcement)
 
     total = audience.count()
     if total == 0:

@@ -1,11 +1,21 @@
 from django.utils import timezone
 from .models import MentorMeeting, MentorNote
+from apps.notifications.services import notify
 
 
 def request_meeting(*, developer, mentor, preferred_time_note=''):
-    return MentorMeeting.objects.create(
+    meeting = MentorMeeting.objects.create(
         developer=developer, mentor=mentor, preferred_time_note=preferred_time_note
     )
+
+    notify(
+        recipient=mentor,
+        category='mentorship',
+        title=f'{developer.full_name} requested a meeting',
+        body=preferred_time_note,
+        object_id=meeting.id,
+    )
+    return meeting
 
 
 def schedule_meeting(*, meeting: MentorMeeting, scheduled_at):
@@ -15,6 +25,13 @@ def schedule_meeting(*, meeting: MentorMeeting, scheduled_at):
     meeting.status = 'scheduled'
     meeting.scheduled_at = scheduled_at
     meeting.save()
+
+    notify(
+        recipient=meeting.developer,
+        category='mentorship',
+        title=f'Meeting scheduled for {scheduled_at.strftime("%b %d, %I:%M %p")}',
+        object_id=meeting.id,
+    )
     return meeting
 
 

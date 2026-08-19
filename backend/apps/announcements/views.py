@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import Announcement
 from .serializers import AnnouncementSerializer, CreateAnnouncementSerializer, ReadStatsSerializer
-from .services import get_visible_announcements, mark_as_read, get_read_stats
+from .services import get_visible_announcements, mark_as_read, get_read_stats, notify_audience
 
 
 class AnnouncementListCreateView(APIView):
@@ -41,6 +41,7 @@ class AnnouncementListCreateView(APIView):
             )
 
         announcement = Announcement.objects.create(author=request.user, **data)
+        notify_audience(announcement=announcement)
         return Response(
             AnnouncementSerializer(announcement, context={'request': request}).data,
             status=status.HTTP_201_CREATED,

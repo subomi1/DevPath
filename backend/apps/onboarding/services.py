@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import (
     OnboardingTemplate, DeveloperJourney, JourneyPhase, JourneyTask
 )
+from apps.notifications.services import notify
 
 
 def clone_template_to_journey(*, developer, template: OnboardingTemplate):
@@ -132,6 +133,13 @@ def submit_task_for_verification(*, task: JourneyTask, submitted_by):
     task.save()
 
     recalculate_progress(task.phase.journey)
+    if task.phase.journey.developer.manager:
+        notify(
+            recipient=task.phase.journey.developer.manager,
+            category='task',
+            title=f'{submitted_by.full_name} submitted "{task.title}" for review',
+            object_id=task.id,
+        )
     return task
 
 
@@ -146,6 +154,12 @@ def verify_task(*, task: JourneyTask, verified_by):
 
     _unlock_next_task(task)
     recalculate_progress(task.phase.journey)
+    notify(
+        recipient=task.phase.journey.developer,
+        category='task',
+        title=f'"{task.title}" was verified',
+        object_id=task.id,
+    )
     return task
 
 
@@ -159,6 +173,13 @@ def send_back_task(*, task: JourneyTask, reviewed_by, reason):
     task.save()
 
     recalculate_progress(task.phase.journey)
+    notify(
+        recipient=task.phase.journey.developer,
+        category='task',
+        title=f'"{task.title}" was sent back',
+        body=reason,
+        object_id=task.id,
+    )
     return task
 
 

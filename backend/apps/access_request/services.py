@@ -1,5 +1,6 @@
 from django.utils import timezone
 from .models import AccessRequest, AccessRequestStatusLog
+from apps.notifications.services import notify
 
 
 def _log_status(access_request, status, changed_by):
@@ -41,6 +42,13 @@ def approve_access_request(*, access_request, reviewed_by):
     access_request.reviewed_by = reviewed_by
     access_request.save()
     _log_status(access_request, 'approved', changed_by=reviewed_by)
+
+    notify(
+        recipient=access_request.developer,
+        category='access_request',
+        title=f'Your {access_request.get_resource_display()} request was approved',
+        object_id=access_request.id,
+    )
     return access_request
 
 
@@ -54,6 +62,14 @@ def reject_access_request(*, access_request, reviewed_by, reason):
     access_request.rejection_reason = reason
     access_request.save()
     _log_status(access_request, 'rejected', changed_by=reviewed_by)
+
+    notify(
+        recipient=access_request.developer,
+        category='access_request',
+        title=f'Your {access_request.get_resource_display()} request was rejected',
+        body=reason,
+        object_id=access_request.id,
+    )
     return access_request
 
 
@@ -64,4 +80,11 @@ def complete_access_request(*, access_request, completed_by):
     access_request.status = 'completed'
     access_request.save()
     _log_status(access_request, 'completed', changed_by=completed_by)
+
+    notify(
+        recipient=access_request.developer,
+        category='access_request',
+        title=f'Your {access_request.get_resource_display()} request is complete — access has been provisioned',
+        object_id=access_request.id,
+    )
     return access_request

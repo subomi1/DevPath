@@ -28,6 +28,7 @@ import DepartmentsPage from "../features/admin/DepartmentsPage";
 import TemplateBuilderPage from "../features/admin/TemplateBuilderPage";
 import KnowledgeBaseManagementPage from "../features/admin/KnowledgeBaseManagementPage";
 import AnnouncementsManagementPage from "../features/admin/AnnouncementsManagementPage";
+import SettingsPage from "../features/admin/SettingsPage";
 
 export function AppRoutes() {
   return (
@@ -239,6 +240,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <AnnouncementsManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

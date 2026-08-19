@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Bell, Search, Menu, X } from "lucide-react";
+import { useUnreadCount } from "../hooks/useNotifications";
+import { NotificationDropdown } from "../components/notifications/NotificationDropdown";
 
 export function TopBar({
   title,
@@ -10,6 +12,8 @@ export function TopBar({
 }) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { data: unreadCount } = useUnreadCount();
 
   if (mobileSearchOpen) {
     return (
@@ -95,13 +99,23 @@ export function TopBar({
         </button>
 
         {/* Notifications */}
-        <button
-          className="relative text-ink-muted hover:text-ink p-2 rounded-xl hover:bg-canvas transition-colors"
-          aria-label="View notifications"
-        >
-          <Bell size={18} />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-xs ring-2 ring-surface" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setNotificationsOpen((v) => !v)}
+            className="relative text-ink-muted hover:text-ink p-2 rounded-xl hover:bg-canvas transition-colors"
+            aria-label="View notifications"
+          >
+            <Bell size={18} />
+            {!!unreadCount && unreadCount > 0 && (
+              <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 flex items-center justify-center bg-primary text-white text-[10px] font-semibold rounded-full ring-2 ring-surface">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+          {notificationsOpen && (
+            <NotificationDropdown onClose={() => setNotificationsOpen(false)} />
+          )}
+        </div>
       </div>
     </header>
   );

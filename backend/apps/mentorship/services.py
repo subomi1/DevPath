@@ -44,10 +44,18 @@ def complete_meeting(*, meeting: MentorMeeting):
     return meeting
 
 
-def cancel_meeting(*, meeting: MentorMeeting):
+def cancel_meeting(*, meeting: MentorMeeting, cancelled_by):
     if meeting.status in ('completed', 'cancelled'):
         raise ValueError('This meeting cannot be cancelled.')
 
     meeting.status = 'cancelled'
     meeting.save()
+
+    other_party = meeting.mentor if cancelled_by.id == meeting.developer_id else meeting.developer
+    notify(
+        recipient=other_party,
+        category='mentorship',
+        title=f'{cancelled_by.full_name} cancelled the meeting',
+        object_id=meeting.id,
+    )
     return meeting

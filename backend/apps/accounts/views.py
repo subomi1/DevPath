@@ -18,7 +18,7 @@ from django.shortcuts import get_object_or_404
 
 
 from .permissions import IsAdminOrHR, IsAdmin
-from .serializers import InviteDeveloperSerializer, ActivateAccountSerializer, UserSerializer, CustomTokenObtainPairSerializer
+from .serializers import InviteDeveloperSerializer, ActivateAccountSerializer, UserSerializer, CustomTokenObtainPairSerializer, AdminUserUpdateSerializer
 from .services import invite_developer, activate_account
 from .models import Invitation, User
 
@@ -199,4 +199,18 @@ class ArchiveUserView(APIView):
     def post(self, request, user_id):
         target_user = get_object_or_404(User, id=user_id)
         set_user_status(user=target_user, new_status='archived')
+        return Response(UserSerializer(target_user).data)
+    
+class UserDetailView(APIView):
+    permission_classes = [IsAdminOrHR]
+
+    def get(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        return Response(UserSerializer(target_user).data)
+
+    def patch(self, request, user_id):
+        target_user = get_object_or_404(User, id=user_id)
+        serializer = AdminUserUpdateSerializer(target_user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(UserSerializer(target_user).data)

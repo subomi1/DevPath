@@ -92,7 +92,7 @@ class CancelMeetingView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            cancel_meeting(meeting=meeting)
+            cancel_meeting(meeting=meeting, cancelled_by=request.user)
         except ValueError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

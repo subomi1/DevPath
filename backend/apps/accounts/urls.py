@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import InviteDeveloperView, ActivateAccountView, ValidateInvitationView, MeView, ResetPasswordView, RequestPasswordResetView, ChangePasswordView, UserListView, ChangeUserRoleView, SuspendUserView, ArchiveUserView
+from .views import InviteDeveloperView, ActivateAccountView, ValidateInvitationView, MeView, ResetPasswordView, RequestPasswordResetView, ChangePasswordView, UserListView, ChangeUserRoleView, SuspendUserView, ArchiveUserView, UserDetailView
 
 urlpatterns = [
     path('invitations/', InviteDeveloperView.as_view(), name='invite-developer'),
@@ -22,4 +22,5 @@ urlpatterns = [
          SuspendUserView.as_view(), name='suspend-user'),
     path('users/<uuid:user_id>/archive/',
          ArchiveUserView.as_view(), name='archive-user'),
+    path('users/<uuid:user_id>/', UserDetailView.as_view(), name='user-detail'),
 ]

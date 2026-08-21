@@ -34,7 +34,11 @@ class InviteDeveloperSerializer(serializers.Serializer):
         max_length=100, required=False, allow_blank=True)
     manager = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role='manager'))
-    mentor = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    mentor = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_mentor=True, status='active'),
+        required=False,
+        allow_null=True,
+    )
     start_date = serializers.DateField()
     onboarding_template = serializers.PrimaryKeyRelatedField(
         queryset=OnboardingTemplate.objects.filter(is_active=True))
@@ -82,6 +86,7 @@ class UserSerializer(serializers.ModelSerializer):
             'team',
             'manager',
             'mentor',
+            'is_mentor',
             'start_date',
             'phone',
             'created_at',
@@ -90,6 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'status',
             'created_at',
+            'is_mentor',
         ]
 
     def validate_phone(self, value):
@@ -129,7 +135,8 @@ class RequestPasswordResetSerializer(serializers.Serializer):
 class ResetPasswordSerializer(serializers.Serializer):
     token = serializers.CharField()
     new_password = serializers.CharField(min_length=8)
-    
+
+
 class ChangePasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(
         write_only=True,
@@ -140,3 +147,10 @@ class ChangePasswordSerializer(serializers.Serializer):
         write_only=True,
         trim_whitespace=False,
     )
+
+
+class AdminUserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['role', 'department', 'team',
+                  'manager', 'mentor', 'is_mentor', 'job_role']

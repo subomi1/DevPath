@@ -43,3 +43,13 @@ export function useArchiveUser() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
   })
 }
+
+export function useToggleMentor() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ userId, is_mentor }: { userId: string; is_mentor: boolean }) => {
+      await client.patch(`/users/${userId}/`, { is_mentor })
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+  })
+}

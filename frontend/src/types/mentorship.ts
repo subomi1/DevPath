@@ -29,3 +29,15 @@ export interface MentorshipSummary {
   meetings: MentorMeeting[]
   goals: MentorNote[]
 }
+
+export interface Mentee {
+  id: string
+  full_name: string
+  email: string
+}
+
+export interface MenteesSummary {
+  mentees: Mentee[]
+  meetings: MentorMeeting[]
+  notes: MentorNote[]
+}

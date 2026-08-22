@@ -9,6 +9,7 @@ export interface DeveloperListItem {
   team: string | null
   manager: string | null
   mentor: string | null
+  is_mentor: boolean
   start_date: string | null
   phone: string
   created_at: string

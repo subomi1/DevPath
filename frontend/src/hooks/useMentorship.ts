@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '../api/client'
-import type { MentorshipSummary } from '../types/mentorship'
+import type { MentorshipSummary, MenteesSummary } from '../types/mentorship'
 
 export function useMyMentorship() {
   return useQuery({
@@ -20,6 +20,16 @@ export function useRequestMeeting() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mentorship', 'me'] })
+    },
+  })
+}
+
+export function useMyMentees() {
+  return useQuery({
+    queryKey: ['mentorship', 'mentees'],
+    queryFn: async () => {
+      const response = await client.get<MenteesSummary>('/mentorship/mentees/')
+      return response.data
     },
   })
 }

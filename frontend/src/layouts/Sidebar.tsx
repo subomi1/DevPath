@@ -16,6 +16,7 @@ import {
   Building2,
   Settings,
   ShieldCheck,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import logo from "../../public/zone.png";
@@ -68,6 +69,12 @@ const navByRole: Record<string, typeof developerNav> = {
   admin: adminNav,
 };
 
+const mentorNavItem = {
+  to: "/mentorship/mentees",
+  label: "My Mentees",
+  icon: GraduationCap,
+};
+
 export function Sidebar({
   isOpen,
   onClose,
@@ -84,7 +91,21 @@ export function Sidebar({
   };
 
   const userInitial = user?.full_name?.charAt(0)?.toUpperCase() ?? "U";
-  const navItems = navByRole[user?.role ?? ""] ?? [];
+  const baseNavItems = navByRole[user?.role ?? ""] ?? [];
+  const navItems = user?.is_mentor
+    ? (() => {
+        const profileIndex = baseNavItems.findIndex(
+          (item) => item.label === "Profile",
+        );
+        const items = [...baseNavItems];
+        if (profileIndex === -1) {
+          items.push(mentorNavItem);
+        } else {
+          items.splice(profileIndex, 0, mentorNavItem);
+        }
+        return items;
+      })()
+    : baseNavItems;
 
   return (
     <>

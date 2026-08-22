@@ -30,7 +30,7 @@ export function useMentors() {
   return useQuery({
     queryKey: ['users', 'mentors'],
     queryFn: async () => {
-      const response = await client.get<SimpleUser[]>('/users/')
+      const response = await client.get<SimpleUser[]>('/users/', { params: { is_mentor: true } })
       return response.data
     },
   })

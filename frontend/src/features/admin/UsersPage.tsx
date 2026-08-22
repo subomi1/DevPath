@@ -7,6 +7,7 @@ import {
   UserX,
   Archive,
   ChevronDown,
+  GraduationCap,
 } from "lucide-react";
 import { AppShell } from "../../layouts/AppShell";
 import {
@@ -14,6 +15,7 @@ import {
   useChangeRole,
   useSuspendUser,
   useArchiveUser,
+  useToggleMentor,
 } from "../../hooks/useUsers";
 
 const ROLES = [
@@ -98,6 +100,16 @@ export default function UsersPage() {
     }
   };
 
+  const toggleMentor = useToggleMentor();
+
+  const handleToggleMentor = (
+    userId: string,
+    userName: string,
+    current: boolean,
+  ) => {
+    toggleMentor.mutate({ userId, is_mentor: !current });
+  };
+
   return (
     <AppShell title="Users & Roles">
       <div className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 max-w-8xl mx-auto w-full min-h-[calc(100vh-4rem)] space-y-6">
@@ -155,6 +167,7 @@ export default function UsersPage() {
                     <tr className="bg-canvas/60 border-b border-border/80 text-[11px] font-semibold text-ink-muted uppercase tracking-wider">
                       <th className="px-5 py-3.5">User Profile</th>
                       <th className="px-5 py-3.5">Role</th>
+                      <th className="px-5 py-3.5">Mentor</th>
                       <th className="px-5 py-3.5">Status</th>
                       <th className="px-5 py-3.5 text-right">Actions</th>
                     </tr>
@@ -205,6 +218,27 @@ export default function UsersPage() {
                               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none"
                             />
                           </div>
+                        </td>
+                        <td className="px-5 py-4">
+                          <button
+                            onClick={() =>
+                              handleToggleMentor(u.id, u.full_name, u.is_mentor)
+                            }
+                            disabled={toggleMentor.isPending}
+                            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer shadow-2xs disabled:opacity-50 ${
+                              u.is_mentor
+                                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                                : "bg-canvas text-ink-muted border-border hover:border-primary/40"
+                            }`}
+                            title={
+                              u.is_mentor
+                                ? "Remove mentor eligibility"
+                                : "Mark as mentor-eligible"
+                            }
+                          >
+                            <GraduationCap size={13} />
+                            {u.is_mentor ? "Mentor" : "Not eligible"}
+                          </button>
                         </td>
                         <td className="px-5 py-4">
                           <StatusPill status={u.status} />

@@ -29,6 +29,7 @@ import TemplateBuilderPage from "../features/admin/TemplateBuilderPage";
 import KnowledgeBaseManagementPage from "../features/admin/KnowledgeBaseManagementPage";
 import AnnouncementsManagementPage from "../features/admin/AnnouncementsManagementPage";
 import SettingsPage from "../features/admin/SettingsPage";
+import MentorMentees from "../features/shared/MentorMentees";
 
 export function AppRoutes() {
   return (
@@ -248,6 +249,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mentorship/mentees"
+          element={
+            <ProtectedRoute>
+              <MentorMentees />
             </ProtectedRoute>
           }
         />

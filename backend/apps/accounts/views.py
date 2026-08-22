@@ -153,7 +153,6 @@ class UserListView(APIView):
         elif role == 'manager':
             queryset = User.objects.filter(manager=request.user)
         else:
-            # developers shouldn't get a general directory of everyone
             return Response({'detail': 'You do not have permission to view this.'}, status=status.HTTP_403_FORBIDDEN)
 
         role_filter = request.query_params.get('role')
@@ -163,6 +162,10 @@ class UserListView(APIView):
         status_filter = request.query_params.get('status')
         if status_filter:
             queryset = queryset.filter(status=status_filter)
+
+        is_mentor_filter = request.query_params.get('is_mentor')
+        if is_mentor_filter is not None:
+            queryset = queryset.filter(is_mentor=is_mentor_filter.lower() == 'true')
 
         search = request.query_params.get('search')
         if search:
